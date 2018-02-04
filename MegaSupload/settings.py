@@ -77,10 +77,12 @@ WSGI_APPLICATION = 'MegaSupload.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'OPTIONS': {
-            'read_default_file': 'myDB.conf'
-        },
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'megasupload',
+        'USER': 'megasupload',
+        'PASSWORD': 'InsertYourPassword',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 
