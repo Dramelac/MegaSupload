@@ -14,8 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from MegaSuploadApp import urls as app_urls
+from MegaSuploadApp import views as app_view
 
 urlpatterns = [
+    path('', app_view.index, name="home"),
+    path('app/', include(app_urls)),
     path('admin/', admin.site.urls),
 ]
