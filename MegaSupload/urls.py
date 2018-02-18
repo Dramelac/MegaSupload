@@ -16,10 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from MegaSuploadApp import urls as app_urls
+from MegaSuploadAPI import urls as api_urls
 from MegaSuploadApp import views as app_view
 
 urlpatterns = [
     path('', app_view.index, name="home"),
     path('app/', include(app_urls)),
+    path('api/', include(api_urls)),
     path('admin/', admin.site.urls),
 ]
