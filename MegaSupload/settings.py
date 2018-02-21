@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'MegaSuploadApp.apps.MegasuploadappConfig',
+    'MegaSuploadAPI.apps.MegasuploadapiConfig'
 ]
 
 MIDDLEWARE = [
