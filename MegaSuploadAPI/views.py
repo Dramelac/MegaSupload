@@ -40,7 +40,10 @@ def register(request):
                                  last_name=last_name, encrypted_priv_key=encrypted_priv_key, pub_key=pub_key)
         auth = authenticate(username=username, password=psw1)
         auth_login(request, auth)
-        return JsonResponse({"message": "Registration successful."}, status=200)
+        return JsonResponse({
+            "message": "Registration successful.",
+            "priv_key": key.exportKey().decode("utf8")
+        }, status=200)
 
 
 @require_http_methods(["POST"])
