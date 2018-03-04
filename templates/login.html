@@ -5,12 +5,8 @@
     <h1>Login</h1>
 
     <form class="col-md-6 offset-md-3" method="post" id="login-form">
-        {% if error %}
-            <div class="alert alert-danger" role="alert">
-                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                {{ error }}
-            </div>
-        {% endif %}
+        <div id="error-msg"></div>
+        {% csrf_token %}
         <div class="form-group">
             <label>Username</label>
             <input type="text" class="form-control" name="pseudo"
@@ -37,13 +33,14 @@
                     "username": $(this).find("input[name='pseudo']").val(),
                     "password": $(this).find("input[name='password']").val()
                 }),
-                success: function(res) {
+                success: function (res) {
                     alert(res.message);
-                    console.log(res.priv_key)
+                    console.log(res.priv_key);
                     window.location = "/"
                 },
                 error: function (err) {
-                    alert(err.responseJSON.message)
+                    console.log(err.responseJSON);
+                    document.getElementById("error-msg").innerHTML = "<div class=\"alert alert-danger\" role=\"alert\">" + err.responseJSON.message + "</div>";
                 }
             });
         })
