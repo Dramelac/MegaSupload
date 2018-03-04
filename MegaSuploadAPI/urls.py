@@ -2,5 +2,6 @@ from django.urls import path
 from MegaSuploadAPI import views as app_view
 
 urlpatterns = [
-    path('', app_view.index, name="home"),
+    path('auth/register', app_view.register),
+    path('auth/login', app_view.login),
 ]

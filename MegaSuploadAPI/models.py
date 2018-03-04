@@ -4,8 +4,8 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     space_allowed = models.IntegerField(default=30)
-    pub_key = models.CharField(max_length=4096)
-    encrypted_priv_key = models.CharField(max_length=4096)
+    pub_key = models.TextField()
+    encrypted_priv_key = models.TextField()
 
 
 class Permission(models.Model):
@@ -43,7 +43,7 @@ class File(models.Model):
 class FileKey(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     file = models.ForeignKey(File, on_delete=models.CASCADE)
-    key = models.CharField(max_length=4096)
+    key = models.TextField()
 
     def __str__(self):
         return "%s - %s" % (self.owner.username, self.file.name)
