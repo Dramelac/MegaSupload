@@ -23,7 +23,7 @@ def register(request):
     email = data.get('email', '').strip()
     psw1 = data.get('psw1', '')
     psw2 = data.get('psw2', '')
-    if not username or not first_name or not last_name or not email or not psw1 or not psw2:
+    if not username or not email or not psw1 or not psw2:
         return JsonResponse({"message": "Please fill all fields."}, status=400)
     if psw1 != psw2:
         return JsonResponse({"message": "Passwords are different."}, status=400)
@@ -70,16 +70,52 @@ def login(request):
         return JsonResponse({"message": "Bad credentials."}, status=401)
 
 
+@login_required
 def logout(request):
     auth_logout(request)
     return HttpResponseRedirect("/")
 
 
-# TODO Auth -> return token
-# TODO User update refer to existing django users
+@login_required
+@require_http_methods(["POST"])
+def update_profile(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except:
+        return JsonResponse({"message": "Bad JSON."}, status=400)
+    first_name = data.get('first_name', '').strip()
+    last_name = data.get('last_name', '').strip()
+    email = data.get('email', '').strip()
+    pwd = data.get('pwd', '')
+    psw1 = data.get('psw1', '')
+    psw2 = data.get('psw2', '')
+    if not email:
+        return JsonResponse({"message": "Please fill all fields."}, status=400)
+    if pwd and psw1 != psw2:
+        return JsonResponse({"message": "Password confirmation is different."}, status=400)
+    if re.compile(r"^[a-z0-9._-]+@[a-z0-9._-]+\.[a-z]+").match(email) is None:
+        return JsonResponse({"message": "Email address is not valid."}, status=400)
+
+    try:
+        current_user = request.user
+        user = User.objects.get(username=current_user)
+        if pwd:
+            auth = authenticate(username=current_user.username, password=pwd)
+            if auth is not None:
+                user.set_password(pwd)
+            else:
+                return JsonResponse({"message": "Current password error."}, status=400)
+        user.email = email
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+        return JsonResponse({
+            "message": "Update successful."
+        }, status=200)
+    except User.DoesNotExist:
+        return JsonResponse({"message": "User not found."}, status=400)
 
 # TODO GetList(CurrentPath = '/') -> return list of file and directory | Filter by permission
 
 # TODO GetFileKey
 # TODO GetFile(FileKey)
-

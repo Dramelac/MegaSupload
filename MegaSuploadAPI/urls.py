@@ -5,4 +5,5 @@ urlpatterns = [
     path('auth/register', app_view.register),
     path('auth/login', app_view.login),
     path('auth/logout', app_view.logout, name="logout"),
+    path('user/update_profile', app_view.update_profile),
 ]

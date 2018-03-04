@@ -4,4 +4,74 @@
 {% block body %}
     <h1>Profile - {{ user.username }}</h1>
 
+    <form class="col-md-6 offset-md-3" method="post" id="profile-form">
+        <div id="error-msg"></div>
+        {% csrf_token %}
+        <div class="form-group">
+            <label>E-Mail</label>
+            <input type="email" class="form-control" name="email" value="{{ user.email }}"
+                   placeholder="ex: toto@gmail.com" required="" autofocus=""/>
+        </div>
+        <div class="form-group">
+            <label>First name</label>
+            <input type="text" class="form-control" name="firstname" value="{{ user.first_name }}"
+                   placeholder="First name" autofocus=""/>
+        </div>
+        <div class="form-group">
+            <label>Last name</label>
+            <input type="text" class="form-control" name="lastname" value="{{ user.last_name }}"
+                   placeholder="Last name" autofocus=""/>
+        </div>
+        <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" class="form-control" name="pwd" placeholder="Current password"/>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="form-control" name="psw1" placeholder="New password"/>
+        </div>
+        <div class="form-group">
+            <label>Password Confirmation</label>
+            <input type="password" class="form-control" name="psw2" placeholder="Confirm password"/>
+        </div>
+        <div class="col-xs-12 text-center">
+            <button class="btn btn-lg btn-primary" type="submit">Register</button>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block script %}
+    <script>
+        $("#profile-form").on("submit", function (e) {
+            e.preventDefault();
+            $.ajax({
+                method: "POST",
+                url: "/api/user/update_profile",
+                dataType: "json",
+                data: JSON.stringify({
+                    "first_name": $(this).find("input[name='firstname']").val(),
+                    "last_name": $(this).find("input[name='lastname']").val(),
+                    "email": $(this).find("input[name='email']").val(),
+                    "pwd": $(this).find("input[name='pwd']").val(),
+                    "psw1": $(this).find("input[name='psw1']").val(),
+                    "psw2": $(this).find("input[name='psw2']").val()
+                }),
+                success: function(res) {
+                    console.log(res);
+                    document.getElementById("error-msg").innerHTML = "<div class=\"alert alert-success\">" + res.message + "</div>";
+                    //window.location = window.location
+                },
+                error: function (err) {
+                    console.log(err.responseJSON.message);
+                    document.getElementById("error-msg").innerHTML = "<div class=\"alert alert-danger\" role=\"alert\">" + err.responseJSON.message + "</div>";
+                },
+                complete: function () {
+                    document.getElementsByName('pwd').value = "";
+                    document.getElementsByName('psw1').value = "";
+                    document.getElementsByName('psw2').value = "";
+                }
+            });
+        })
+    </script>
 {% endblock %}
