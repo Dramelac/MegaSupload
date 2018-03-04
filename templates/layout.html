@@ -39,7 +39,8 @@
                     <li class="nav-item"><a class="btn btn-outline-warning" href="{% url "register" %}">Register</a></li>
                 {% endif %}
                 {% if user.is_authenticated %}
-                    <li class="nav-item"><a class="btn btn-outline-dark" href="{% url "home" %}">Déconnexion</a></li>
+                    <li class="nav-item"><a href="#">{{ user.username }}</a></li>
+                    <li class="nav-item"><a class="btn btn-outline-dark" href="{% url "logout" %}">Déconnexion</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -52,6 +53,7 @@
 
 <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
 <script src="{% static 'js/bootstrap4/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
 {% block script %}
 {% endblock %}
 </body>

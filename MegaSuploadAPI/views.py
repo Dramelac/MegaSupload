@@ -1,5 +1,5 @@
-from django.contrib.auth import authenticate, login as auth_login
-from django.http import HttpResponse, JsonResponse
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 
@@ -70,9 +70,9 @@ def login(request):
         return JsonResponse({"message": "Bad credentials."}, status=401)
 
 
-@login_required()
-def example_login_required(request):
-    pass
+def logout(request):
+    auth_logout(request)
+    return HttpResponseRedirect("/")
 
 
 # TODO Auth -> return token
