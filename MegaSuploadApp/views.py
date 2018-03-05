@@ -17,3 +17,8 @@ def register(request):
 @login_required(login_url="/app/login")
 def profile(request):
     return render(request, 'user_profile.html')
+
+
+@login_required
+def upload(request):
+    return render(request, 'upload.html')

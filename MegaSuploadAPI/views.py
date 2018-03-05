@@ -4,6 +4,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 
 from MegaSuploadAPI.DAL.FileSystemDAO import *
+from MegaSuploadAPI.forms import *
 from MegaSuploadAPI.models import *
 
 import re
@@ -125,8 +126,12 @@ def update_profile(request):
 @login_required
 @require_http_methods(["POST"])
 def upload(request):
-    filekey = store_file("", None)
-    return JsonResponse({"message": "Success."}, status=200)
+    form = UploadFileForm(request.POST, request.FILES)
+    if form.is_valid():
+        file = request.FILES['file']
+        store_file("/"+request.user.username+"/", file)
+        return JsonResponse({"message": "Success."}, status=200)
+    return JsonResponse({"message": "Error invalid input."}, status=400)
 
 
 @login_required

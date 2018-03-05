@@ -26,6 +26,9 @@ class File(models.Model):
     def __str__(self):
         return "%s - %s" % (self.path, self.name)
 
+    def fullpath(self):
+        return self.path+"/"+self.name
+
 
 class Permission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

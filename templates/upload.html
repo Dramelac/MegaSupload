@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block body %}
+    <h1>Register</h1>
+
+
+    <form action="{% url "upload" %}" class="col-md-6 offset-md-3" method="post" id="upload-form" enctype="multipart/form-data">
+    Select file to upload:
+        {% csrf_token %}
+    <input type="file" name="file" id="fileToUpload">
+    <input type="submit" value="Upload" name="submit">
+    </form>
+
+{% endblock %}
+{% block script %}
+{% endblock %}
