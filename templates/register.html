@@ -59,9 +59,9 @@
                     "psw2": $(this).find("input[name='psw2']").val()
                 }),
                 success: function(res) {
-                    //alert(res.message);
-                    console.log(res.priv_key);
-                    window.location = "/"
+                    localStorage.priv_key = res.priv_key;
+                    localStorage.pub_key = res.pub_key;
+                    window.location = "/";
                 },
                 error: function (err) {
                     console.log(err.responseJSON.message);
