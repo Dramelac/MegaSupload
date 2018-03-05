@@ -40,7 +40,7 @@
                 {% endif %}
                 {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link active" href="{% url "profile" %}">{{ user.username }}</a></li>
-                    <li class="nav-item"><a class="btn btn-outline-dark" href="{% url "logout" %}">Déconnexion</a></li>
+                    <li class="nav-item"><a class="btn btn-outline-dark" href="#" onclick="delete localStorage.priv_key;delete localStorage.pub_key;window.location='{% url "logout" %}'">Déconnexion</a></li>
                 {% endif %}
             </ul>
         </div>

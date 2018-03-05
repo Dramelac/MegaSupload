@@ -29,6 +29,8 @@ def register(request):
         return JsonResponse({"message": "Please fill all fields."}, status=400)
     if psw1 != psw2:
         return JsonResponse({"message": "Passwords are different."}, status=400)
+    if len(psw1) < 6:
+        return JsonResponse({"message": "Password is too short. Should be at least 6 characters long."}, status=400)
     try:
         User.objects.get(username=username)
         return JsonResponse({"message": "User already exist."}, status=400)
@@ -97,27 +99,33 @@ def update_profile(request):
         return JsonResponse({"message": "Please fill all fields."}, status=400)
     if pwd and psw1 != psw2:
         return JsonResponse({"message": "Password confirmation is different."}, status=400)
+    if pwd and len(psw1) < 6:
+        return JsonResponse({"message": "Password is two short. Should be at least 6 characters long."}, status=400)
     if re.compile(r"^[a-z0-9._-]+@[a-z0-9._-]+\.[a-z]+").match(email) is None:
         return JsonResponse({"message": "Email address is not valid."}, status=400)
+    user = User.objects.get(id=request.user.id)
+    key = False
+    if pwd:
+        auth = authenticate(username=user.username, password=pwd)
+        if auth is None:
+            return JsonResponse({"message": "Current password error."}, status=400)
+        try:
+            key = RSA.import_key(user.encrypted_priv_key.encode("utf8"), passphrase=pwd)
+        except:
+            return JsonResponse({"message": "Private key decryption failed."}, status=500)
+        user.set_password(psw1)
+        user.encrypted_priv_key = key.exportKey(passphrase=psw1, pkcs=8, protection="scryptAndAES128-CBC").decode("utf8")
+        user.pub_key = key.publickey().exportKey().decode("utf8")
+    user.email = email
+    user.first_name = first_name
+    user.last_name = last_name
+    user.save()
+    return JsonResponse({
+        "message": "Update successful.",
+        "priv_key": key.exportKey().decode("utf8") if key else "",
+        "pub_key": user.pub_key
+    }, status=200)
 
-    try:
-        current_user = request.user
-        user = User.objects.get(username=current_user)
-        if pwd:
-            auth = authenticate(username=current_user.username, password=pwd)
-            if auth is not None:
-                user.set_password(pwd)
-            else:
-                return JsonResponse({"message": "Current password error."}, status=400)
-        user.email = email
-        user.first_name = first_name
-        user.last_name = last_name
-        user.save()
-        return JsonResponse({
-            "message": "Update successful."
-        }, status=200)
-    except User.DoesNotExist:
-        return JsonResponse({"message": "User not found."}, status=400)
 
 
 # TODO GetList(CurrentPath = '/') -> return list of file and directory | Filter by permission
