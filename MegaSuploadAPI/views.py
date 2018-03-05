@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 
+from MegaSuploadAPI.DAL.FileSystemDAO import *
 from MegaSuploadAPI.models import *
 
 import re
@@ -115,7 +116,23 @@ def update_profile(request):
     except User.DoesNotExist:
         return JsonResponse({"message": "User not found."}, status=400)
 
+
 # TODO GetList(CurrentPath = '/') -> return list of file and directory | Filter by permission
 
 # TODO GetFileKey
 # TODO GetFile(FileKey)
+
+@login_required
+@require_http_methods(["POST"])
+def upload(request):
+    filekey = store_file("", None)
+    return JsonResponse({"message": "Success."}, status=200)
+
+
+@login_required
+def download(request):
+    try:
+        data = get_file(None)
+        return JsonResponse({"message": data}, status=200)
+    except Exception:
+        return JsonResponse({"message": "File not found"}, status=404)
