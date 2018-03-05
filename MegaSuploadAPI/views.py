@@ -43,7 +43,8 @@ def register(request):
         auth_login(request, auth)
         return JsonResponse({
             "message": "Registration successful.",
-            "priv_key": key.exportKey().decode("utf8")
+            "priv_key": key.exportKey().decode("utf8"),
+            "pub_key": pub_key
         }, status=200)
 
 
@@ -65,7 +66,8 @@ def login(request):
         auth_login(request, auth)
         return JsonResponse({
             "message": "Login successful.",
-            "priv_key": key.exportKey().decode("utf8")
+            "priv_key": key.exportKey().decode("utf8"),
+            "pub_key": key.publickey().exportKey().decode("utf8")
         }, status=200)
     else:
         return JsonResponse({"message": "Bad credentials."}, status=401)
