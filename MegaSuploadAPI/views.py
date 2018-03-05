@@ -139,7 +139,16 @@ def upload(request):
 @login_required
 def download(request):
     try:
-        data = get_file(None)
-        return JsonResponse({"message": data}, status=200)
-    except Exception:
+        data = json.loads(request.body.decode("utf-8"))
+    except:
+        return JsonResponse({"message": "Bad JSON."}, status=400)
+    try:
+        path = data.get('path', '/')
+        name = data.get('name', '')
+        file = get_file(str(request.user)+path+name, "")
+        response = HttpResponse(file, content_type="text/plain")
+        response['Content-Disposition'] = 'inline; filename=' + name
+        return response
+    except Exception as e:
+        print(e)
         return JsonResponse({"message": "File not found"}, status=404)
