@@ -7,7 +7,6 @@ from MegaSuploadAPI.models import Directory
 
 
 # TODO Remove Directory (+ File + Permission linked)
-# TODO Move/Rename Directory
 
 def addDirectory(user, name, parent=None):
     directory = Directory.objects.create(name=name, parent=parent)
@@ -57,3 +56,31 @@ def listDirectory(directory, user):
         if perm is not None and perm.read:
             result.append(dir.name)
     return result
+
+
+def renameDirectory(directory, newname, user):
+    perm = PermissionDAO.getPermissionFromDir(directory, user)
+    if perm.edit:
+        directory.name = newname
+        directory.save()
+    else:
+        raise PermissionDenied
+
+
+def moveDirectory(directory, newParent, user):
+    perm = PermissionDAO.getPermissionFromDir(directory, user)
+    if perm.edit:
+        directory.parent = newParent
+        directory.save()
+    else:
+        raise PermissionDenied
+
+
+# Only for owner (for now)
+def removeDirectory(directory, user):
+    perm = PermissionDAO.getPermissionFromDir(directory, user)
+    if perm.owner:
+        # TODO Add file removed
+        # dirList = Directory.objects.filter(parent=directory)
+        directory.delete()  # Cascade delete ?
+        # FK problem ? to test
