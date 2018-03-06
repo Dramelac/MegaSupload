@@ -1,5 +1,3 @@
-import json
-
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, FieldError
 from django.http import HttpResponse, JsonResponse
@@ -23,23 +21,27 @@ def upload(request):
 
 @login_required
 def download(request):
+    dirId = request.GET.get("did")
+    fileId = request.GET.get("fid")
     try:
-        data = json.loads(request.body.decode("utf-8"))
-    except:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
+        directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
+    except (ObjectDoesNotExist, PermissionDenied):
+        return JsonResponse({"message": "Not found"}, status=404)
+    except FieldError:
+        return JsonResponse({"message": "Bad input"}, status=400)
+
+    # TODO add file DAO
     try:
-        path = data.get('path', '/')
-        name = data.get('name', '')
-        # TODO update with directory
-        file = FileSystemDAO.get_file("/" + str(request.user) + path + name, "")
+        file = FileSystemDAO.get_file(directory, fileId, "")
         response = HttpResponse(file, content_type="text/plain")
-        response['Content-Disposition'] = 'inline; filename=' + name
+        response['Content-Disposition'] = 'inline; filename=' + fileId
         return response
     except ObjectDoesNotExist:
         return JsonResponse({"message": "File not found"}, status=404)
 
 
-def pathDownload(request):
+@login_required
+def downloadPath(request):
     path = request.GET.get("path")
     file = request.GET.get("file")
     try:
@@ -48,7 +50,6 @@ def pathDownload(request):
         return JsonResponse({"message": "Not found"}, status=404)
     except FieldError:
         return JsonResponse({"message": "Bad input"}, status=400)
-    print(directory)
 
     # TODO add file DAO
     try:
