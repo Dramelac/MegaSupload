@@ -31,7 +31,8 @@ def getDirectoryFromPath(path, user):
         directory = Directory.objects.get(name=name, parent=directory)
 
     perm = PermissionDAO.getPermissionFromDir(directory, user)
-    if perm is not None and perm.read:
+    # Only owner can use this interface // for now
+    if perm is not None and perm.owner:
         return directory
     else:
         raise PermissionDenied
@@ -47,3 +48,13 @@ def getDirectoryFromId(dirId, user):
             raise PermissionDenied
     else:
         raise ObjectDoesNotExist
+
+
+def listDirectory(directory, user):
+    dirList = Directory.objects.filter(parent=directory)
+    result = []
+    for dir in dirList:
+        perm = PermissionDAO.getPermissionFromDir(directory, user)
+        if perm is not None and perm.read:
+            result.append(dir.name)
+    return result

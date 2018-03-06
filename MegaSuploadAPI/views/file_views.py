@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, FieldError
 from django.http import HttpResponse, JsonResponse
@@ -67,7 +69,47 @@ def test(request):
     # test API method
     pass
 
-# TODO GetList(CurrentPath = '/') -> return list of file and directory | Filter by permission
+
+@login_required
+def ls(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except:
+        return JsonResponse({"message": "Bad JSON."}, status=400)
+    path = data.get('path', '').strip()
+    user = request.user
+
+    try:
+        directory = DirectoryDAO.getDirectoryFromPath(path, request.user)
+    except (ObjectDoesNotExist, PermissionDenied):
+        return JsonResponse({"message": "Not found"}, status=404)
+    except FieldError:
+        return JsonResponse({"message": "Bad input"}, status=400)
+
+    dirList = DirectoryDAO.listDirectory(directory, user)
+    # TODO add file list
+    return JsonResponse({"directory": dirList, "file": []}, status=200)
+
+
+@login_required
+def addDirectory(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except:
+        return JsonResponse({"message": "Bad JSON."}, status=400)
+    path = data.get('path', '').strip()
+    name = data.get('name', '').strip()
+    user = request.user
+
+    try:
+        directory = DirectoryDAO.getDirectoryFromPath(path, request.user)
+    except (ObjectDoesNotExist, PermissionDenied):
+        return JsonResponse({"message": "Not found"}, status=404)
+    except FieldError:
+        return JsonResponse({"message": "Bad input"}, status=400)
+
+    DirectoryDAO.addDirectory(user, name, directory)
+    return JsonResponse({"message": "Success"}, status=200)
 
 # TODO GetFileKey
 # TODO GetFile(FileKey)
