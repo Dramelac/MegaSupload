@@ -115,15 +115,12 @@ def update_profile(request):
             return JsonResponse({"message": "Private key decryption failed."}, status=500)
         user.set_password(psw1)
         user.encrypted_priv_key = key.exportKey(passphrase=psw1, pkcs=8, protection="scryptAndAES128-CBC").decode("utf8")
-        user.pub_key = key.publickey().exportKey().decode("utf8")
     user.email = email
     user.first_name = first_name
     user.last_name = last_name
     user.save()
     return JsonResponse({
-        "message": "Update successful.",
-        "priv_key": key.exportKey().decode("utf8") if key else "",
-        "pub_key": user.pub_key
+        "message": "Update successful."
     }, status=200)
 
 
