@@ -1,33 +1,42 @@
+import uuid
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     space_allowed = models.IntegerField(default=30)
     pub_key = models.TextField()
     encrypted_priv_key = models.TextField()
 
 
-class Directory (models.Model):
-    path = models.CharField(max_length=255)
+class Directory(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return "%s - %s" % (self.path, self.name)
+        return self.getFullPath()
+
+    def getFullPath(self):
+        if self.parent is None:
+            return "/" + self.name
+        else:
+            return self.parent.getFullPath() + "/" + self.name
 
 
 class File(models.Model):
-    path = models.CharField(max_length=4096)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     directory = models.ForeignKey(Directory, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     type = models.CharField(max_length=255)
 
     def __str__(self):
-        return "%s - %s" % (self.path, self.name)
+        return "%s - %s" % (self.directory.getFullPath(), self.name)
 
-    def fullpath(self):
-        return self.path+"/"+self.name
+    def fullPath(self):
+        return self.directory.getFullPath() + "/" + self.name
 
 
 class Permission(models.Model):
@@ -40,7 +49,8 @@ class Permission(models.Model):
     directory = models.ForeignKey(Directory, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return "%s - Read: %d, Edit: %d, Share: %d, Owner: %d" % (self.user.username, self.read, self.edit, self.share, self.owner)
+        return "%s - Read: %d, Edit: %d, Share: %d, Owner: %d" % (
+            self.user.username, self.read, self.edit, self.share, self.owner)
 
 
 class FileKey(models.Model):

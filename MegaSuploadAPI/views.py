@@ -127,7 +127,6 @@ def update_profile(request):
     }, status=200)
 
 
-
 # TODO GetList(CurrentPath = '/') -> return list of file and directory | Filter by permission
 
 # TODO GetFileKey
@@ -153,7 +152,7 @@ def download(request):
     try:
         path = data.get('path', '/')
         name = data.get('name', '')
-        file = get_file(str(request.user)+path+name, "")
+        file = get_file("/"+str(request.user)+path+name, "")
         response = HttpResponse(file, content_type="text/plain")
         response['Content-Disposition'] = 'inline; filename=' + name
         return response

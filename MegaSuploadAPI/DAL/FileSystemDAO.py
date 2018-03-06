@@ -3,20 +3,21 @@
 
 import os
 
+
 # Use File System (for now)
 # For testing purpose use null parameter value and hardcoded data
 
 def store_file(path, file):
     if not os.path.exists(os.path.dirname(path)):
-        os.makedirs(os.path.dirname('fs_storage'+path))
-    with open('fs_storage'+path+file.name, 'wb+') as destination:
+        os.makedirs(os.path.dirname('fs_storage' + path))
+    with open('fs_storage' + path + file.name, 'wb+') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
     return "FileKey"
 
 
 def get_file(path, key):
-    file = open('fs_storage/'+path, 'r')
+    file = open('fs_storage' + path, 'r')
     data = file.read()
     file.close()
     return data
