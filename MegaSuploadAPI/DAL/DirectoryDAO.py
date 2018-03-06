@@ -7,7 +7,6 @@ from MegaSuploadAPI.models import Directory
 
 
 # TODO Remove Directory (+ File + Permission linked)
-# TODO Share Directory
 # TODO Move/Rename Directory
 
 def addDirectory(user, name, parent=None):
