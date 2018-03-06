@@ -25,6 +25,7 @@
     <script>
         $("#login-form").on("submit", function (e) {
             e.preventDefault();
+            $("#error-msg").hide();
             $.ajax({
                 method: "POST",
                 url: "/api/auth/login",
@@ -43,10 +44,12 @@
                     console.log(encrypted);
                     console.log(decrypted);
                     window.location = "/";
+                    $("#error-msg").show();
                 },
                 error: function (err) {
                     console.log(err.responseJSON);
                     document.getElementById("error-msg").innerHTML = "<div class=\"alert alert-danger\" role=\"alert\">" + err.responseJSON.message + "</div>";
+                    $("#error-msg").show();
                 }
             });
         })
