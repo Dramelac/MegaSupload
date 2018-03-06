@@ -7,7 +7,12 @@ import os
 # Use File System (for now)
 # For testing purpose use null parameter value and hardcoded data
 
-def store_file(path, file):
+def initRootDirectory(directory):
+    os.makedirs(os.path.dirname('fs_storage' + directory.getRootPath()))
+
+
+def store_file(directory, file):
+    path = directory.getRootPath()
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname('fs_storage' + path))
     with open('fs_storage' + path + file.name, 'wb+') as destination:

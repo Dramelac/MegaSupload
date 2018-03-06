@@ -1,7 +1,7 @@
 import uuid
 
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 
 class User(AbstractUser):
@@ -21,9 +21,16 @@ class Directory(models.Model):
 
     def getFullPath(self):
         if self.parent is None:
-            return "/" + self.name
+            return "/"
+            # return "/" + str(self.name)
         else:
             return self.parent.getFullPath() + "/" + self.name
+
+    def getRootPath(self):
+        if self.parent is None:
+            return "/" + str(self.name) + "/"
+        else:
+            return self.parent.getRootPath()
 
 
 class File(models.Model):

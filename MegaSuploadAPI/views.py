@@ -1,16 +1,15 @@
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-
-from MegaSuploadAPI.DAL.FileSystemDAO import *
-from MegaSuploadAPI.forms import *
-from MegaSuploadAPI.models import *
-
-import re
 import json
+import re
 
 from Crypto.PublicKey import RSA
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.views.decorators.http import require_http_methods
+
+from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO
+from MegaSuploadAPI.forms import *
+from MegaSuploadAPI.models import *
 
 
 @require_http_methods(["POST"])
@@ -40,8 +39,10 @@ def register(request):
         key = RSA.generate(2048)
         encrypted_priv_key = key.exportKey(passphrase=psw1, pkcs=8, protection="scryptAndAES128-CBC").decode("utf8")
         pub_key = key.publickey().exportKey().decode("utf8")
-        User.objects.create_user(username=username, email=email, password=psw1, first_name=first_name,
+        user = User.objects.create_user(username=username, email=email, password=psw1, first_name=first_name,
                                  last_name=last_name, encrypted_priv_key=encrypted_priv_key, pub_key=pub_key)
+        directory = DirectoryDAO.addDirectory(user, user.id)
+        FileSystemDAO.initRootDirectory(directory)
         auth = authenticate(username=username, password=psw1)
         auth_login(request, auth)
         return JsonResponse({
@@ -135,7 +136,7 @@ def upload(request):
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
         file = request.FILES['file']
-        store_file("/"+request.user.username+"/", file)
+        FileSystemDAO.store_file("/"+request.user.username+"/", file)
         return JsonResponse({"message": "Success."}, status=200)
     return JsonResponse({"message": "Error invalid input."}, status=400)
 
@@ -149,7 +150,8 @@ def download(request):
     try:
         path = data.get('path', '/')
         name = data.get('name', '')
-        file = get_file("/"+str(request.user)+path+name, "")
+        # TODO update with directory
+        file = FileSystemDAO.get_file("/"+str(request.user)+path+name, "")
         response = HttpResponse(file, content_type="text/plain")
         response['Content-Disposition'] = 'inline; filename=' + name
         return response
