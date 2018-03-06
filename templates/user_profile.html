@@ -45,6 +45,7 @@
     <script>
         $("#profile-form").on("submit", function (e) {
             e.preventDefault();
+            $("#error-msg").hide();
             $.ajax({
                 method: "POST",
                 url: "/api/user/update_profile",
@@ -69,6 +70,7 @@
                     document.getElementsByName('pwd').value = "";
                     document.getElementsByName('psw1').value = "";
                     document.getElementsByName('psw2').value = "";
+                    $("#error-msg").show();
                 }
             });
         })

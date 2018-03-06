@@ -46,6 +46,7 @@
     <script>
         $("#register-form").on("submit", function (e) {
             e.preventDefault();
+            $("#error-msg").hide();
             $.ajax({
                 method: "POST",
                 url: "/api/auth/register",
@@ -62,10 +63,12 @@
                     localStorage.priv_key = res.priv_key;
                     localStorage.pub_key = res.pub_key;
                     window.location = "/";
+                    $("#error-msg").show();
                 },
                 error: function (err) {
                     console.log(err.responseJSON.message);
                     document.getElementById("error-msg").innerHTML = "<div class=\"alert alert-danger\" role=\"alert\">" + err.responseJSON.message + "</div>";
+                    $("#error-msg").show();
                 }
             });
         })
