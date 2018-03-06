@@ -4,11 +4,10 @@ import re
 from Crypto.PublicKey import RSA
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
 
 from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO
-from MegaSuploadAPI.forms import *
 from MegaSuploadAPI.models import *
 
 
@@ -40,7 +39,7 @@ def register(request):
         encrypted_priv_key = key.exportKey(passphrase=psw1, pkcs=8, protection="scryptAndAES128-CBC").decode("utf8")
         pub_key = key.publickey().exportKey().decode("utf8")
         user = User.objects.create_user(username=username, email=email, password=psw1, first_name=first_name,
-                                 last_name=last_name, encrypted_priv_key=encrypted_priv_key, pub_key=pub_key)
+                                        last_name=last_name, encrypted_priv_key=encrypted_priv_key, pub_key=pub_key)
         directory = DirectoryDAO.addDirectory(user, user.id)
         FileSystemDAO.initRootDirectory(directory)
         auth = authenticate(username=username, password=psw1)
@@ -58,8 +57,10 @@ def login(request):
         data = json.loads(request.body.decode("utf-8"))
     except:
         return JsonResponse({"message": "Bad JSON."}, status=400)
+
     username = data.get('username', '').strip()
     password = data.get('password', '')
+
     auth = authenticate(username=username, password=password)
     if auth is not None:
         user = User.objects.get(id=auth.id)
@@ -68,6 +69,7 @@ def login(request):
         except:
             return JsonResponse({"message": "Private key decryption failed."}, status=500)
         auth_login(request, auth)
+
         return JsonResponse({
             "message": "Login successful.",
             "priv_key": key.exportKey().decode("utf8"),
@@ -90,12 +92,14 @@ def update_profile(request):
         data = json.loads(request.body.decode("utf-8"))
     except:
         return JsonResponse({"message": "Bad JSON."}, status=400)
+
     first_name = data.get('first_name', '').strip()
     last_name = data.get('last_name', '').strip()
     email = data.get('email', '').strip()
     pwd = data.get('pwd', '')
     psw1 = data.get('psw1', '')
     psw2 = data.get('psw2', '')
+
     if not email:
         return JsonResponse({"message": "Please fill all fields."}, status=400)
     if pwd and psw1 != psw2:
@@ -105,7 +109,7 @@ def update_profile(request):
     if re.compile(r"^[a-z0-9._-]+@[a-z0-9._-]+\.[a-z]+").match(email) is None:
         return JsonResponse({"message": "Email address is not valid."}, status=400)
     user = User.objects.get(id=request.user.id)
-    key = False
+
     if pwd:
         auth = authenticate(username=user.username, password=pwd)
         if auth is None:
@@ -115,7 +119,9 @@ def update_profile(request):
         except:
             return JsonResponse({"message": "Private key decryption failed."}, status=500)
         user.set_password(psw1)
-        user.encrypted_priv_key = key.exportKey(passphrase=psw1, pkcs=8, protection="scryptAndAES128-CBC").decode("utf8")
+        user.encrypted_priv_key = key.exportKey(passphrase=psw1, pkcs=8, protection="scryptAndAES128-CBC").decode(
+            "utf8")
+
     user.email = email
     user.first_name = first_name
     user.last_name = last_name
@@ -123,38 +129,3 @@ def update_profile(request):
     return JsonResponse({
         "message": "Update successful."
     }, status=200)
-
-
-# TODO GetList(CurrentPath = '/') -> return list of file and directory | Filter by permission
-
-# TODO GetFileKey
-# TODO GetFile(FileKey)
-
-@login_required
-@require_http_methods(["POST"])
-def upload(request):
-    form = UploadFileForm(request.POST, request.FILES)
-    if form.is_valid():
-        file = request.FILES['file']
-        FileSystemDAO.store_file("/"+request.user.username+"/", file)
-        return JsonResponse({"message": "Success."}, status=200)
-    return JsonResponse({"message": "Error invalid input."}, status=400)
-
-
-@login_required
-def download(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-    try:
-        path = data.get('path', '/')
-        name = data.get('name', '')
-        # TODO update with directory
-        file = FileSystemDAO.get_file("/"+str(request.user)+path+name, "")
-        response = HttpResponse(file, content_type="text/plain")
-        response['Content-Disposition'] = 'inline; filename=' + name
-        return response
-    except Exception as e:
-        print(e)
-        return JsonResponse({"message": "File not found"}, status=404)

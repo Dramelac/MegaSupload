@@ -1,11 +1,12 @@
 from django.urls import path
-from MegaSuploadAPI import views as app_view
+
+from MegaSuploadAPI.views import users_views, file_views
 
 urlpatterns = [
-    path('auth/register', app_view.register),
-    path('auth/login', app_view.login),
-    path('auth/logout', app_view.logout, name="logout"),
-    path('user/update_profile', app_view.update_profile),
-    path('file/upload', app_view.upload, name="upload"),
-    path('file/download', app_view.download, name="download"),
+    path('auth/register', users_views.register),
+    path('auth/login', users_views.login),
+    path('auth/logout', users_views.logout, name="logout"),
+    path('user/update_profile', users_views.update_profile),
+    path('file/upload', file_views.upload, name="upload"),
+    path('file/download', file_views.download, name="download"),
 ]
