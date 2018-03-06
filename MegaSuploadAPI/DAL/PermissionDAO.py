@@ -1,6 +1,3 @@
-# TODO Add Permission
-# TODO Update Permission (except owner)
-# TODO Remove Permission
 from MegaSuploadAPI.models import Permission, File
 
 
@@ -47,6 +44,39 @@ def share(user, userTarget, element, read, write, share):
         else:
             build.directory = element
         build.save()
+    else:
+        raise Exception('Insufficient permission')
+
+
+# Update permission of a specific user // Only for file/directory owner
+def update(user, userTarget, element, read, write, share):
+    isFile = type(element) is File
+    if write and not read:
+        raise Exception('Inconsistent permission')
+    perm = Permission.objects.get(file=element, user=user) if isFile else \
+        Permission.objects.get(directory=element, user=user)
+    if perm is not None and perm.owner:
+        targetPerm = Permission.objects.get(file=element, user=userTarget) if isFile else \
+            Permission.objects.get(directory=element, user=userTarget)
+        if targetPerm is not None:
+            targetPerm.read = read
+            targetPerm.edit = write
+            targetPerm.share = share
+            targetPerm.save()
+    else:
+        raise Exception('Insufficient permission')
+
+
+# Remove permission of a specific user // Only for file/directory owner
+def remove(user, userTarget, element):
+    isFile = type(element) is File
+    perm = Permission.objects.get(file=element, user=user) if isFile else \
+        Permission.objects.get(directory=element, user=user)
+    if perm is not None and perm.owner:
+        targetPerm = Permission.objects.get(file=element, user=userTarget) if isFile else \
+            Permission.objects.get(directory=element, user=userTarget)
+        if targetPerm is not None:
+            targetPerm.delete()
     else:
         raise Exception('Insufficient permission')
 
