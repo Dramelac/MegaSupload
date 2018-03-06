@@ -21,8 +21,8 @@ def store_file(directory, file):
     return "FileKey"
 
 
-def get_file(path, key):
-    file = open('fs_storage' + path, 'r')
+def get_file(directory, file, key):
+    file = open('fs_storage' + directory.getRootPath() + file, 'r')
     data = file.read()
     file.close()
     return data

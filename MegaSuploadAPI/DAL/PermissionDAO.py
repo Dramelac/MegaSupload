@@ -38,3 +38,7 @@ def share(user, userTarget, element, read, write, share):
         build.save()
     else:
         raise Exception('Insufficient permission')
+
+
+def getPermissionFromDir(directory, user):
+    return Permission.objects.get(user=user, directory=directory)
