@@ -60,10 +60,6 @@
                 success: function(res) {
                     console.log(res);
                     document.getElementById("error-msg").innerHTML = "<div class=\"alert alert-success\">" + res.message + "</div>";
-                    if (res.priv_key) {
-                        localStorage.priv_key = res.priv_key;
-                        localStorage.pub_key = res.pub_key;
-                    }
                 },
                 error: function (err) {
                     console.log(err.responseJSON.message);
