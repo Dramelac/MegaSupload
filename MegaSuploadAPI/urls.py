@@ -12,5 +12,7 @@ urlpatterns = [
     path('file/my_download', file_views.downloadPath),
     path('file/list_item', file_views.ls),
     path('file/add_dir', file_views.addDirectory),
+    path('file/rename_dir', file_views.renameDirectory),
+    path('file/rename_file', file_views.renameFile),
     path('test', file_views.test),
 ]

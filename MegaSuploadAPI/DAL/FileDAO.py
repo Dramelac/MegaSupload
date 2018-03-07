@@ -1,9 +1,8 @@
 # TODO Remove File (+ FileKey / Permission linked)
-# TODO Update File (TODO LATER)
 # TODO Move/Rename File
 
 # /!\ This DAO DON'T interact with FileSystem !!! (only file indexing) Use FileSystemDAO for file storage !
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
 from MegaSuploadAPI.DAL import PermissionDAO, FileSystemDAO
 from MegaSuploadAPI.models import File
@@ -38,3 +37,38 @@ def uploadFile(file, directory, user):
     except ObjectDoesNotExist:
         # new file
         _newFile(file, directory, user)
+
+
+def rename(file, newname, user):
+    perm = PermissionDAO.getPermission(file, user)
+    if perm.owner or perm.edit:
+        file.name = newname
+        file.save()
+    else:
+        raise PermissionDenied
+
+
+def getFileFromId(fileId, user):
+    file = File.objects.get(id=fileId)
+    if file is not None:
+        perm = PermissionDAO.getPermission(file, user)
+        if perm is not None and (perm.owner or perm.read):
+            return file
+        else:
+            raise PermissionDenied
+    else:
+        raise ObjectDoesNotExist
+
+
+def listFiles(directory, user):
+    dirPerm = PermissionDAO.getPermission(directory, user)
+    fileList = File.objects.filter(directory=directory)
+    result = []
+    for file in fileList:
+        if dirPerm is not None and dirPerm.read:
+            result.append((file.name, file.id))
+        else:
+            perm = PermissionDAO.getPermission(file, user)
+            if perm is not None and perm.read:
+                result.append((file.name, file.id))
+    return result

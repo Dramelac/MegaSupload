@@ -96,8 +96,8 @@ def ls(request):
         return JsonResponse({"message": "Bad input"}, status=400)
 
     dirList = DirectoryDAO.listDirectory(directory, user)
-    # TODO add file list
-    return JsonResponse({"directory": dirList, "file": []}, status=200)
+    fileList = FileDAO.listFiles(directory, user)
+    return JsonResponse({"directory": dirList, "file": fileList}, status=200)
 
 
 @login_required
@@ -119,6 +119,46 @@ def addDirectory(request):
 
     DirectoryDAO.addDirectory(user, name, directory)
     return JsonResponse({"message": "Success"}, status=200)
+
+
+@login_required
+def renameDirectory(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except:
+        return JsonResponse({"message": "Bad JSON."}, status=400)
+    elementId = data.get('uuid', '').strip()
+    name = data.get('name', '').strip()
+    user = request.user
+
+    try:
+        directory = DirectoryDAO.getDirectoryFromId(elementId, request.user)
+    except (ObjectDoesNotExist, PermissionDenied):
+        return JsonResponse({"message": "Not found"}, status=404)
+    except FieldError:
+        return JsonResponse({"message": "Bad input"}, status=400)
+
+    DirectoryDAO.rename(directory, name, user)
+
+
+@login_required
+def renameFile(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except:
+        return JsonResponse({"message": "Bad JSON."}, status=400)
+    elementId = data.get('uuid', '').strip()
+    name = data.get('name', '').strip()
+    user = request.user
+
+    try:
+        file = FileDAO.getFileFromId(elementId, request.user)
+    except (ObjectDoesNotExist, PermissionDenied):
+        return JsonResponse({"message": "Not found"}, status=404)
+    except FieldError:
+        return JsonResponse({"message": "Bad input"}, status=400)
+
+    FileDAO.rename(file, name, user)
 
 # TODO GetFileKey
 # TODO GetFile(FileKey)

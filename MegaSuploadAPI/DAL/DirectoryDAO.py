@@ -40,7 +40,7 @@ def getDirectoryFromId(dirId, user):
     directory = Directory.objects.get(id=dirId)
     if directory is not None:
         perm = PermissionDAO.getPermission(directory, user)
-        if perm is not None and perm.read:
+        if perm is not None and (perm.owner or perm.read):
             return directory
         else:
             raise PermissionDenied
@@ -58,7 +58,7 @@ def listDirectory(directory, user):
     return result
 
 
-def renameDirectory(directory, newname, user):
+def rename(directory, newname, user):
     perm = PermissionDAO.getPermission(directory, user)
     if perm.edit:
         directory.name = newname
