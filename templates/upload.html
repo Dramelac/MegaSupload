@@ -5,11 +5,14 @@
     <h1>Upload file</h1>
 
 
-    <form action="{% url "upload" %}" class="col-md-6 offset-md-3" method="post" id="upload-form" enctype="multipart/form-data">
-    Select file to upload:
+    <form action="{% url "upload" %}" class="col-md-6 offset-md-3" method="post" id="upload-form"
+          enctype="multipart/form-data">
         {% csrf_token %}
-    <input type="file" name="file" id="fileToUpload">
-    <input type="submit" value="Upload" name="submit">
+        <label for="directory-id-input">Directory UUID (debug input)</label><br>
+        <input type="text" name="dirId" id="directory-id-input"><br><br>
+        Select file to upload:<br>
+        <input type="file" name="file" id="fileToUpload">
+        <input type="submit" value="Upload" name="submit">
     </form>
 
 {% endblock %}

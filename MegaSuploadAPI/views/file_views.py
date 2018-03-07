@@ -6,7 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO
+from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO
 from MegaSuploadAPI.forms import *
 
 
@@ -15,8 +15,17 @@ from MegaSuploadAPI.forms import *
 def upload(request):
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
+        dirId = request.POST.get("dirId")
+        try:
+            directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
+        except (ObjectDoesNotExist, PermissionDenied):
+            return JsonResponse({"message": "Not found"}, status=404)
+        except FieldError:
+            return JsonResponse({"message": "Bad input"}, status=400)
+
         file = request.FILES['file']
-        FileSystemDAO.store_file("/" + request.user.username + "/", file)
+        FileDAO.newFile(file, directory, request.user)
+
         return JsonResponse({"message": "Success."}, status=200)
     return JsonResponse({"message": "Error invalid input."}, status=400)
 
@@ -55,8 +64,8 @@ def downloadPath(request):
 
     # TODO add file DAO
     try:
-        file = FileSystemDAO.get_file(directory, file, "")
-        response = HttpResponse(file, content_type="text/plain")
+        data = FileSystemDAO.get_file(directory, file, "")
+        response = HttpResponse(data, content_type="text/plain")
         response['Content-Disposition'] = 'inline; filename=' + file
         return response
     except ObjectDoesNotExist:
