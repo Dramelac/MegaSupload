@@ -81,5 +81,7 @@ def remove(user, userTarget, element):
         raise Exception('Insufficient permission')
 
 
-def getPermissionFromDir(directory, user):
-    return Permission.objects.get(user=user, directory=directory)
+def getPermission(element, user):
+    if type(element) == File:
+        return Permission.objects.get(user=user, file=element)
+    return Permission.objects.get(user=user, directory=element)

@@ -28,7 +28,7 @@ def getDirectoryFromPath(path, user):
             continue
         directory = Directory.objects.get(name=name, parent=directory)
 
-    perm = PermissionDAO.getPermissionFromDir(directory, user)
+    perm = PermissionDAO.getPermission(directory, user)
     # Only owner can use this interface // for now
     if perm is not None and perm.owner:
         return directory
@@ -39,7 +39,7 @@ def getDirectoryFromPath(path, user):
 def getDirectoryFromId(dirId, user):
     directory = Directory.objects.get(id=dirId)
     if directory is not None:
-        perm = PermissionDAO.getPermissionFromDir(directory, user)
+        perm = PermissionDAO.getPermission(directory, user)
         if perm is not None and perm.read:
             return directory
         else:
@@ -52,14 +52,14 @@ def listDirectory(directory, user):
     dirList = Directory.objects.filter(parent=directory)
     result = []
     for dir in dirList:
-        perm = PermissionDAO.getPermissionFromDir(directory, user)
+        perm = PermissionDAO.getPermission(directory, user)
         if perm is not None and perm.read:
             result.append((dir.name, dir.id))
     return result
 
 
 def renameDirectory(directory, newname, user):
-    perm = PermissionDAO.getPermissionFromDir(directory, user)
+    perm = PermissionDAO.getPermission(directory, user)
     if perm.edit:
         directory.name = newname
         directory.save()
@@ -68,7 +68,7 @@ def renameDirectory(directory, newname, user):
 
 
 def moveDirectory(directory, newParent, user):
-    perm = PermissionDAO.getPermissionFromDir(directory, user)
+    perm = PermissionDAO.getPermission(directory, user)
     if perm.edit:
         directory.parent = newParent
         directory.save()
@@ -78,7 +78,7 @@ def moveDirectory(directory, newParent, user):
 
 # Only for owner (for now)
 def removeDirectory(directory, user):
-    perm = PermissionDAO.getPermissionFromDir(directory, user)
+    perm = PermissionDAO.getPermission(directory, user)
     if perm.owner:
         # TODO Add file removed
         # dirList = Directory.objects.filter(parent=directory)
