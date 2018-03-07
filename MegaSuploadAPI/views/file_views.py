@@ -24,7 +24,7 @@ def upload(request):
             return JsonResponse({"message": "Bad input"}, status=400)
 
         file = request.FILES['file']
-        FileDAO.newFile(file, directory, request.user)
+        FileDAO.uploadFile(file, directory, request.user)
 
         return JsonResponse({"message": "Success."}, status=200)
     return JsonResponse({"message": "Error invalid input."}, status=400)
