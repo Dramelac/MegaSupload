@@ -54,7 +54,7 @@ def listDirectory(directory, user):
     for dir in dirList:
         perm = PermissionDAO.getPermissionFromDir(directory, user)
         if perm is not None and perm.read:
-            result.append(dir.name)
+            result.append((dir.name, dir.id))
     return result
 
 
