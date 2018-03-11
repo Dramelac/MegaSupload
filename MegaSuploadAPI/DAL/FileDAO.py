@@ -1,5 +1,4 @@
 # TODO Remove File (+ FileKey / Permission linked)
-# TODO Move/Rename File
 
 # /!\ This DAO DON'T interact with FileSystem !!! (only file indexing) Use FileSystemDAO for file storage !
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
@@ -43,6 +42,15 @@ def rename(file, newname, user):
     perm = PermissionDAO.getPermission(file, user)
     if perm.owner or perm.edit:
         file.name = newname
+        file.save()
+    else:
+        raise PermissionDenied
+
+
+def move(file, newDirectory, user):
+    perm = PermissionDAO.getPermission(file, user)
+    if perm.edit:
+        file.directory = newDirectory
         file.save()
     else:
         raise PermissionDenied

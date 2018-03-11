@@ -160,5 +160,49 @@ def renameFile(request):
 
     FileDAO.rename(file, name, user)
 
+
+# TOTEST
+@login_required
+def moveDir(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except:
+        return JsonResponse({"message": "Bad JSON."}, status=400)
+    dirId = data.get('dirId', '').strip()
+    targetDirId = data.get('targetDirId', '').strip()
+    user = request.user
+
+    try:
+        directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
+        parentDir = DirectoryDAO.getDirectoryFromId(targetDirId, request.user)
+    except (ObjectDoesNotExist, PermissionDenied):
+        return JsonResponse({"message": "Not found"}, status=404)
+    except FieldError:
+        return JsonResponse({"message": "Bad input"}, status=400)
+
+    DirectoryDAO.moveDirectory(directory, parentDir, user)
+
+
+# TOTEST
+@login_required
+def moveFile(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except:
+        return JsonResponse({"message": "Bad JSON."}, status=400)
+    fileId = data.get('fileId', '').strip()
+    dirId = data.get('dirId', '').strip()
+    user = request.user
+
+    try:
+        file = FileDAO.getFileFromId(fileId, request.user)
+        directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
+    except (ObjectDoesNotExist, PermissionDenied):
+        return JsonResponse({"message": "Not found"}, status=404)
+    except FieldError:
+        return JsonResponse({"message": "Bad input"}, status=400)
+
+    FileDAO.move(file, directory, user)
+
 # TODO GetFileKey
 # TODO GetFile(FileKey)
