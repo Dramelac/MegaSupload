@@ -129,6 +129,8 @@ def renameDirectory(request):
         return JsonResponse({"message": "Bad JSON."}, status=400)
     elementId = data.get('uuid', '').strip()
     name = data.get('name', '').strip()
+    if not elementId or not name:
+        return JsonResponse({"message": "Bad input"}, status=400)
     user = request.user
 
     try:
@@ -139,6 +141,7 @@ def renameDirectory(request):
         return JsonResponse({"message": "Bad input"}, status=400)
 
     DirectoryDAO.rename(directory, name, user)
+    return JsonResponse({"message": "Success"}, status=200)
 
 
 @login_required
@@ -149,6 +152,8 @@ def renameFile(request):
         return JsonResponse({"message": "Bad JSON."}, status=400)
     elementId = data.get('uuid', '').strip()
     name = data.get('name', '').strip()
+    if not elementId or not name:
+        return JsonResponse({"message": "Bad input"}, status=400)
     user = request.user
 
     try:
@@ -159,9 +164,9 @@ def renameFile(request):
         return JsonResponse({"message": "Bad input"}, status=400)
 
     FileDAO.rename(file, name, user)
+    return JsonResponse({"message": "Success"}, status=200)
 
 
-# TOTEST
 @login_required
 def moveDir(request):
     try:
@@ -170,6 +175,9 @@ def moveDir(request):
         return JsonResponse({"message": "Bad JSON."}, status=400)
     dirId = data.get('dirId', '').strip()
     targetDirId = data.get('targetDirId', '').strip()
+    if not dirId or not targetDirId or dirId == targetDirId:
+        return JsonResponse({"message": "Bad input"}, status=400)
+
     user = request.user
 
     try:
@@ -181,9 +189,9 @@ def moveDir(request):
         return JsonResponse({"message": "Bad input"}, status=400)
 
     DirectoryDAO.moveDirectory(directory, parentDir, user)
+    return JsonResponse({"message": "Success"}, status=200)
 
 
-# TOTEST
 @login_required
 def moveFile(request):
     try:
@@ -203,6 +211,7 @@ def moveFile(request):
         return JsonResponse({"message": "Bad input"}, status=400)
 
     FileDAO.move(file, directory, user)
+    return JsonResponse({"message": "Success"}, status=200)
 
 # TODO GetFileKey
 # TODO GetFile(FileKey)
