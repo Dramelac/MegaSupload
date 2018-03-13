@@ -3,11 +3,18 @@ var test = new Vue({
     delimiters: ['[[', ']]'],
     data: {
         directories: [],
-        files: []
+        files: [],
+        loader: true
     },
     mounted: async function () {
         var data = await $.getJSON('/api/file/list_item');
         this.files = data.file;
         this.directories = data.directory;
+        this.loader = false
+    },
+    methods: {
+        fileClicked: function (fileId, dirId) {
+            window.open('/api/file/download?did=' + dirId + '&fid=' + fileId,'_blank');
+        }
     }
 });
