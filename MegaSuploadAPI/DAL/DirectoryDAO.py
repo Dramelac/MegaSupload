@@ -53,16 +53,16 @@ def getDirectoryFromId(dirId, user):
 
 
 def listDirectory(directory, user):
-    dirList = Directory.objects.filter(parent=directory).values()
+    dirList = Directory.objects.filter(parent=directory)
     result = []
     dirPerm = PermissionDAO.getPermission(directory, user)
     for tempDir in dirList:
         perm = PermissionDAO.getPermission(tempDir, user)
         if dirPerm.read or (perm is not None and perm.read):
-            result.append(tempDir)
+            result.append({'name': tempDir.name, 'id': tempDir.id})
     result.append({
         'name': '.',
-         'id': directory.id,
+        'id': directory.id,
         'type': 'current'
     })
     parent = directory.parent
