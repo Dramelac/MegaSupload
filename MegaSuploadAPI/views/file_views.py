@@ -1,4 +1,5 @@
 import json
+from json import JSONDecodeError
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, FieldError
@@ -36,20 +37,20 @@ def download(request):
     fileId = request.GET.get("fid")
     try:
         directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
+        file = FileDAO.getFileFromId(fileId, request.user)
     except (ObjectDoesNotExist, PermissionDenied):
         return JsonResponse({"message": "Not found"}, status=404)
     except FieldError:
         return JsonResponse({"message": "Bad input"}, status=400)
 
-    # TODO add file DAO
+    # TODO add FileKeyDAO
     try:
-        file = FileDAO.getFileFromId(fileId, request.user)
-        file_data = FileSystemDAO.get_file(directory, fileId, "")
+        file_data = FileSystemDAO.get_file(directory, file.id, "")
         response = HttpResponse(file_data, content_type=file.type)
         response['Content-Disposition'] = 'inline; filename=' + file.name
         return response
     except ObjectDoesNotExist:
-        return JsonResponse({"message": "File not found"}, status=404)
+        return JsonResponse({"message": "Not found"}, status=404)
 
 
 @login_required
@@ -70,7 +71,7 @@ def downloadPath(request):
         response['Content-Disposition'] = 'inline; filename=' + file
         return response
     except ObjectDoesNotExist:
-        return JsonResponse({"message": "File not found"}, status=404)
+        return JsonResponse({"message": "Not found"}, status=404)
 
 
 @csrf_exempt
@@ -80,8 +81,8 @@ def test(request):
     # put your code here ok
     user = request.user
     file = FileDAO.getFileFromId('40080269-6423-4810-b2f4-d51ff7578eec', user=user)
-    FileKeyDAO.newFileKey(user,file)
-    #filekey = FileKeyDAO.getFileKey(user, file)
+    FileKeyDAO.newFileKey(user, file)
+    # fileKey = FileKeyDAO.getFileKey(user, file)
 
     return JsonResponse({"message": "Executed"}, status=200)
 
@@ -90,7 +91,7 @@ def test(request):
 def ls(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
-    except:
+    except JSONDecodeError:
         return JsonResponse({"message": "Bad JSON."}, status=400)
     path = data.get('path', '').strip()
     user = request.user
@@ -111,7 +112,7 @@ def ls(request):
 def addDirectory(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
-    except:
+    except JSONDecodeError:
         return JsonResponse({"message": "Bad JSON."}, status=400)
     path = data.get('path', '').strip()
     name = data.get('name', '').strip()
@@ -132,7 +133,7 @@ def addDirectory(request):
 def renameDirectory(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
-    except:
+    except JSONDecodeError:
         return JsonResponse({"message": "Bad JSON."}, status=400)
     elementId = data.get('uuid', '').strip()
     name = data.get('name', '').strip()
@@ -155,7 +156,7 @@ def renameDirectory(request):
 def renameFile(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
-    except:
+    except JSONDecodeError:
         return JsonResponse({"message": "Bad JSON."}, status=400)
     elementId = data.get('uuid', '').strip()
     name = data.get('name', '').strip()
@@ -178,7 +179,7 @@ def renameFile(request):
 def moveDir(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
-    except:
+    except JSONDecodeError:
         return JsonResponse({"message": "Bad JSON."}, status=400)
     dirId = data.get('dirId', '').strip()
     targetDirId = data.get('targetDirId', '').strip()
@@ -203,7 +204,7 @@ def moveDir(request):
 def moveFile(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
-    except:
+    except JSONDecodeError:
         return JsonResponse({"message": "Bad JSON."}, status=400)
     fileId = data.get('fileId', '').strip()
     dirId = data.get('dirId', '').strip()
