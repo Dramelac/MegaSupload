@@ -1,10 +1,19 @@
-async function loadDir(dirId) {
+async function loadDir(dirId, dirName) {
     this.loader = true;
     var data = await $.getJSON('/api/file/list_item?did=' + (dirId || ''));
     this.files = data.file;
-    this.directories = data.directory;
+    this.directories = data.directory.filter(function (d) {
+        return d.name !== ".";
+    }).sort(function (a, b) {
+        return a - b;
+    });
     this.loader = false;
-    $("#path").text("/")
+    if (dirName === "..") {
+        this.path.pop();
+    } else if (dirName !== ".") {
+        this.path.push(dirName)
+    }
+    $("#path").text(this.path.join(""))
 }
 var fileManager = new Vue({
     el: '#fileApp',
@@ -12,7 +21,8 @@ var fileManager = new Vue({
     data: {
         directories: [],
         files: [],
-        loader: true
+        loader: true,
+        path: ["/"]
     },
     mounted: loadDir,
     methods: {
