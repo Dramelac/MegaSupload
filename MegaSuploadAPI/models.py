@@ -22,9 +22,8 @@ class Directory(models.Model):
     def getFullPath(self):
         if self.parent is None:
             return "/"
-            # return "/" + str(self.name)
         else:
-            return self.parent.getFullPath() + "/" + self.name
+            return self.parent.getFullPath() + self.name + "/"
 
     def getRootPath(self):
         if self.parent is None:
