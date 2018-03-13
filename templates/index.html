@@ -4,6 +4,7 @@
 {% block body %}
     <h1>Home Page !</h1>
     {% if user.is_authenticated %}
+        <div id="path">/</div>
         <div id="fileApp">
             <div class="sk-circle" v-show="loader">
                 <div class="sk-circle1 sk-child"></div>
@@ -19,7 +20,7 @@
                 <div class="sk-circle11 sk-child"></div>
                 <div class="sk-circle12 sk-child"></div>
             </div>
-            <div v-for="dir in directories" v-cloak class="directory">
+            <div v-for="dir in directories" v-cloak class="directory" v-on:click="openDir(dir.id)">
                 <i class="fas fa-folder"></i>
                 <span>[[ dir.name ]]</span>
             </div>
