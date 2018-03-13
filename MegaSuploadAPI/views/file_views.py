@@ -7,7 +7,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, FileKeyDAO, PermissionDAO
+from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, PermissionDAO
 from MegaSuploadAPI.forms import *
 
 
@@ -17,6 +17,7 @@ def upload(request):
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
         dirId = request.POST.get("dirId")
+        key = request.POST.get("key")
         try:
             directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
         except (ObjectDoesNotExist, PermissionDenied):
@@ -25,10 +26,16 @@ def upload(request):
             return JsonResponse({"message": "Bad input"}, status=400)
 
         file = request.FILES['file']
-        FileDAO.uploadFile(file, directory, request.user)
+        try:
+            FileDAO.uploadFile(file, directory, request.user, key)
+        except PermissionDenied:
+            return JsonResponse({"message": "Not found"}, status=404)
 
         return JsonResponse({"message": "Success."}, status=200)
     return JsonResponse({"message": "Error invalid input."}, status=400)
+
+
+# TODO add isKeyNeeded method before upload
 
 
 @login_required

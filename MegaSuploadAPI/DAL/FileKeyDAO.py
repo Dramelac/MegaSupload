@@ -1,8 +1,9 @@
-import binascii
 import base64
+import binascii
 import os
-from Crypto.PublicKey import RSA
+
 from Crypto.Cipher import PKCS1_OAEP
+from Crypto.PublicKey import RSA
 from django.core.exceptions import ObjectDoesNotExist
 
 from MegaSuploadAPI.models import FileKey
@@ -18,6 +19,7 @@ def newFileKey(owner, file):
     key = base64.b64encode(cipher_rsa.encrypt(uncrypted_key))
 
     FileKey.objects.create(owner=owner, file=file, key=key)
+    return uncrypted_key
 
 
 def remove(owner, file):

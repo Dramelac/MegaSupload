@@ -1,6 +1,3 @@
-# TODO Store File(Data) -> return FileKey
-# TODO Get File(FileKey) -> return Data (Or permission Exception -> 404 error code)
-
 import os
 
 
@@ -13,9 +10,11 @@ def initRootDirectory(directory):
     os.makedirs(os.path.dirname('fs_storage' + directory.getRootPath()))
 
 
-def store_file(directory, file, file_id):
+def store_file(directory, file, file_id, key):
+    # TODO encrypt data
     if type(file_id) is UUID:
         file_id = str(file_id)
+    # TODO move path to setting file
     path = 'fs_storage' + directory.getRootPath()
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
@@ -26,6 +25,7 @@ def store_file(directory, file, file_id):
 
 
 def get_file(directory, fileId, key):
+    # TODO check key + decrypt data
     file_data = open('fs_storage' + directory.getRootPath() + str(fileId), 'rb')
     data = file_data.read()
     file_data.close()

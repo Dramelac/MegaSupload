@@ -3,7 +3,7 @@
 # /!\ This DAO DON'T interact with FileSystem !!! (only file indexing) Use FileSystemDAO for file storage !
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
-from MegaSuploadAPI.DAL import PermissionDAO, FileSystemDAO
+from MegaSuploadAPI.DAL import PermissionDAO, FileSystemDAO, FileKeyDAO
 from MegaSuploadAPI.models import File
 
 
@@ -11,28 +11,31 @@ def _newFile(file, directory, user):
     build_file = File.objects.create(directory=directory, name=file.name, type=file.content_type)
     PermissionDAO.inheritPermission(directory, user, build_file)
 
-    # TODO Add FileKey
-    FileSystemDAO.store_file(directory, file, build_file.id)
+    key = FileKeyDAO.newFileKey(owner=user, file=build_file)
+    FileSystemDAO.store_file(directory, file, build_file.id, key)
 
 
-def _updateFile(file, file_fs, directory, user):
+def _updateFile(file, file_fs, directory, user, key):
     perm = PermissionDAO.getPermission(file_fs, user)
     dirPerm = PermissionDAO.getPermission(directory, user)
 
     if (perm is not None and (perm.owner or perm.edit)) or \
             (dirPerm is not None and (dirPerm.owner or dirPerm.edit)):
-        # TODO Add FileKey
-        FileSystemDAO.store_file(directory, file, file_fs.id)
+        FileSystemDAO.store_file(directory, file, file_fs.id, key)
     else:
         raise PermissionError
 
 
 # This method permit to avoid name duplicate on a same directory
-def uploadFile(file, directory, user):
+def uploadFile(file, directory, user, key=None):
     try:
         result = File.objects.get(directory=directory, name=file.name)
+        perm = PermissionDAO.getPermission(result, user)
         # existing file -> update
-        _updateFile(file, result, directory, user)
+        if key is not None and perm is not None and perm.edit:
+            _updateFile(file, result, directory, user, key)
+        else:
+            raise PermissionDenied
     except ObjectDoesNotExist:
         # new file
         _newFile(file, directory, user)
