@@ -10,7 +10,7 @@ async function loadDir(dirId, dirName) {
     this.loader = false;
     if (dirName === "..") {
         this.path.pop();
-    } else if (dirName !== ".") {
+    } else if (dirName && dirName !== ".") {
         this.path.push(dirName + "/")
     }
     $("#path").text(this.path.join(""))
