@@ -70,13 +70,13 @@ def getFileFromId(fileId, user):
 
 def listFiles(directory, user):
     dirPerm = PermissionDAO.getPermission(directory, user)
-    fileList = File.objects.filter(directory=directory)
+    fileList = File.objects.filter(directory=directory).values()
     result = []
     for file in fileList:
         if dirPerm is not None and dirPerm.read:
-            result.append((file.name, file.id))
+            result.append(file)
         else:
             perm = PermissionDAO.getPermission(file, user)
             if perm is not None and perm.read:
-                result.append((file.name, file.id))
-    return result
+                result.append(file)
+    return list(result)
