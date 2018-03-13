@@ -44,7 +44,7 @@ def download(request):
     # TODO add file DAO
     try:
         file = FileSystemDAO.get_file(directory, fileId, "")
-        response = HttpResponse(file, content_type="text/plain")
+        response = HttpResponse(file, content_type=file.type)
         response['Content-Disposition'] = 'inline; filename=' + fileId
         return response
     except ObjectDoesNotExist:
@@ -65,7 +65,7 @@ def downloadPath(request):
     # TODO add file DAO
     try:
         data = FileSystemDAO.get_file(directory, file, "")
-        response = HttpResponse(data, content_type="text/plain")
+        response = HttpResponse(data, content_type=file.type)
         response['Content-Disposition'] = 'inline; filename=' + file
         return response
     except ObjectDoesNotExist:

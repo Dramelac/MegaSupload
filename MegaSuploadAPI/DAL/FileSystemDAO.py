@@ -26,7 +26,7 @@ def store_file(directory, file, file_id):
 
 
 def get_file(directory, fileId, key):
-    file_data = open('fs_storage' + directory.getRootPath() + fileId, 'r')
+    file_data = open('fs_storage' + directory.getRootPath() + fileId, 'rb')
     data = file_data.read()
     file_data.close()
     return data
