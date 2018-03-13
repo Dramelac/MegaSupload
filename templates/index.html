@@ -4,12 +4,29 @@
 {% block body %}
     <h1>Home Page !</h1>
     {% if user.is_authenticated %}
+        <div id="path">/</div>
         <div id="fileApp">
-            <div v-for="dir in directories">
-                Directory: [[ dir.name ]]
+            <div class="sk-circle" v-show="loader">
+                <div class="sk-circle1 sk-child"></div>
+                <div class="sk-circle2 sk-child"></div>
+                <div class="sk-circle3 sk-child"></div>
+                <div class="sk-circle4 sk-child"></div>
+                <div class="sk-circle5 sk-child"></div>
+                <div class="sk-circle6 sk-child"></div>
+                <div class="sk-circle7 sk-child"></div>
+                <div class="sk-circle8 sk-child"></div>
+                <div class="sk-circle9 sk-child"></div>
+                <div class="sk-circle10 sk-child"></div>
+                <div class="sk-circle11 sk-child"></div>
+                <div class="sk-circle12 sk-child"></div>
             </div>
-            <div v-for="file in files">
-                File: [[ file.name ]]
+            <div v-for="dir in directories" v-cloak class="directory" v-on:click="openDir(dir.id)">
+                <i class="fas fa-folder"></i>
+                <span>[[ dir.name ]]</span>
+            </div>
+            <div v-for="file in files" v-cloak class="file" v-on:click="fileClicked(file.id, file.directory_id)">
+                <i class="fas fa-file"></i>
+                <span>[[ file.name ]]</span>
             </div>
         </div>
     {% endif %}
