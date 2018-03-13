@@ -58,8 +58,8 @@ def test(request):
     # test API method
     # put your code here ok
     user = request.user
-    file = FileDAO.getFileFromId('40080269-6423-4810-b2f4-d51ff7578eec', user=user)
-    FileKeyDAO.newFileKey(user, file)
+    directory = DirectoryDAO.getDirectoryFromId('93457884-7959-4aea-a833-88a7a6052ba2', user=user)
+    DirectoryDAO.removeDirectory(directory, user)
     # fileKey = FileKeyDAO.getFileKey(user, file)
 
     return JsonResponse({"message": "Executed"}, status=200)

@@ -1,6 +1,6 @@
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
-from MegaSuploadAPI.DAL import PermissionDAO
+from MegaSuploadAPI.DAL import PermissionDAO, FileDAO
 from MegaSuploadAPI.models import Directory
 
 
@@ -96,8 +96,11 @@ def moveDirectory(directory, newParent, user):
 # Only for owner (for now)
 def removeDirectory(directory, user):
     perm = PermissionDAO.getPermission(directory, user)
-    if perm.owner:
+    if perm.owner and directory.parent is not None:
         # TODO Add file removed
+        fileList = FileDAO.listFiles(directory, user)
+        for file in fileList:
+            FileDAO.remove(file['id'], user)
         # dirList = Directory.objects.filter(parent=directory)
         directory.delete()  # Cascade delete ?
         # FK problem ? to test
