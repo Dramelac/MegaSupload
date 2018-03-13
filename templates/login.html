@@ -43,8 +43,8 @@
                     var decrypted = privateKey.decrypt(encrypted);
                     console.log(encrypted);
                     console.log(decrypted);
-                    window.location = "/";
-                    $("#error-msg").show();
+                    var regex = window.location.search.substr(1).match(/next=([a-z\/]+)\&?/);
+                    window.location = regex ? regex[1] || "/" : "/";
                 },
                 error: function (err) {
                     console.log(err.responseJSON);

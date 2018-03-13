@@ -6,7 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO
+from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, FileKeyDAO
 from MegaSuploadAPI.forms import *
 
 
@@ -76,7 +76,13 @@ def downloadPath(request):
 @login_required
 def test(request):
     # test API method
-    pass
+    # put your code here ok
+    user = request.user
+    file = FileDAO.getFileFromId('40080269-6423-4810-b2f4-d51ff7578eec', user=user)
+    FileKeyDAO.newFileKey(user,file)
+    #filekey = FileKeyDAO.getFileKey(user, file)
+
+    return JsonResponse({"message": "Executed"}, status=200)
 
 
 @login_required
