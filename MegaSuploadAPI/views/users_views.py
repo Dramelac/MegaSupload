@@ -1,5 +1,6 @@
 import json
 import re
+from json import JSONDecodeError
 
 from Crypto.PublicKey import RSA
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
@@ -15,7 +16,7 @@ from MegaSuploadAPI.models import *
 def register(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
-    except:
+    except JSONDecodeError:
         return JsonResponse({"message": "Bad JSON."}, status=400)
     username = data.get('username', '').strip()
     first_name = data.get('first_name', '').strip()
@@ -55,7 +56,7 @@ def register(request):
 def login(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
-    except:
+    except JSONDecodeError:
         return JsonResponse({"message": "Bad JSON."}, status=400)
 
     username = data.get('username', '').strip()
@@ -90,7 +91,7 @@ def logout(request):
 def update_profile(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
-    except:
+    except JSONDecodeError:
         return JsonResponse({"message": "Bad JSON."}, status=400)
 
     first_name = data.get('first_name', '').strip()

@@ -43,9 +43,8 @@ def download(request):
     except FieldError:
         return JsonResponse({"message": "Bad input"}, status=400)
 
-    # TODO add FileKeyDAO
     try:
-        file_data = FileSystemDAO.get_file(directory, file.id, "")
+        file_data = FileSystemDAO.get_file(directory, file.id, "")  # TODO add FileKey
         response = HttpResponse(file_data, content_type=file.type)
         response['Content-Disposition'] = 'inline; filename=' + file.name
         return response
@@ -204,4 +203,3 @@ def moveFile(request):
     return JsonResponse({"message": "Success"}, status=200)
 
 # TODO GetFileKey
-# TODO GetFile(FileKey)
