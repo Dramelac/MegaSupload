@@ -79,10 +79,10 @@ def test(request):
     # put your code here ok
     user = request.user
     file = FileDAO.getFileFromId('40080269-6423-4810-b2f4-d51ff7578eec', user=user)
+    FileKeyDAO.newFileKey(user,file)
+    #filekey = FileKeyDAO.getFileKey(user, file)
 
-    filekey = FileKeyDAO.getFileKey(user, file)
-
-    return JsonResponse({"message": "Executed","data":filekey.key}, status=200)
+    return JsonResponse({"message": "Executed"}, status=200)
 
 
 @login_required
