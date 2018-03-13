@@ -68,14 +68,16 @@ def test(request):
 @login_required
 def ls(request):
     dirId = request.GET.get("did", '')
+    user = request.user
     if not dirId:
-        #dirId = TODO => get root dir ID
-    try:
-        directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
-    except (ObjectDoesNotExist, PermissionDenied):
-        return JsonResponse({"message": "Not found"}, status=404)
-    except FieldError:
-        return JsonResponse({"message": "Bad input"}, status=400)
+        directory = DirectoryDAO.getRootDirectory(user)
+    else:
+        try:
+            directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
+        except (ObjectDoesNotExist, PermissionDenied):
+            return JsonResponse({"message": "Not found"}, status=404)
+        except FieldError:
+            return JsonResponse({"message": "Bad input"}, status=400)
 
     dirList = DirectoryDAO.listDirectory(directory, request.user)
     fileList = FileDAO.listFiles(directory, request.user)

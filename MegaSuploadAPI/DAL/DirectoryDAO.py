@@ -15,6 +15,10 @@ def addDirectory(user, name, parent=None):
     return directory
 
 
+def getRootDirectory(user):
+    return Directory.objects.get(name=user.id, parent=None)
+
+
 """ # Old deprecated method
 def getDirectoryFromPath(path, user):
     if not re.compile("^/").match(path):
@@ -51,10 +55,15 @@ def getDirectoryFromId(dirId, user):
 def listDirectory(directory, user):
     dirList = Directory.objects.filter(parent=directory)
     result = []
-    for dir in dirList:
-        perm = PermissionDAO.getPermission(directory, user)
-        if perm is not None and perm.read:
-            result.append((dir.name, dir.id))
+    dirPerm = PermissionDAO.getPermission(directory, user)
+    for tempDir in dirList:
+        perm = PermissionDAO.getPermission(tempDir, user)
+        if dirPerm.read or (perm is not None and perm.read):
+            result.append((tempDir.name, tempDir.id))
+    result.append(('.', directory.id))
+    parent = directory.parent
+    if parent is not None:
+        result.append(('..', parent.id))
     return result
 
 
