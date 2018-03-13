@@ -80,3 +80,11 @@ def listFiles(directory, user):
             if perm is not None and perm.read:
                 result.append((file.name, file.id))
     return result
+
+
+def remove(fileId, user):
+    file = getFileFromId(fileId, user)
+    perm = PermissionDAO.getPermission(file, user)
+    if perm is not None and perm.owner:
+        PermissionDAO.remove(user, user, file)
+        file.delete()
