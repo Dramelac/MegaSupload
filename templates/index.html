@@ -3,4 +3,15 @@
 
 {% block body %}
     <h1>Home Page !</h1>
+    {% if user.is_authenticated %}
+        <div id="fileApp">
+            [[message]]
+        </div>
+    {% endif %}
+{% endblock %}
+{% block script %}
+    <script src="{% static 'js/vue.min.js' %}"></script>
+    {% if user.is_authenticated %}
+        <script src="{% static 'js/app.js' %}"></script>
+    {% endif %}
 {% endblock %}

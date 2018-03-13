@@ -81,8 +81,8 @@ def ls(request):
     except FieldError:
         return JsonResponse({"message": "Bad input"}, status=400)
 
-    dirList = DirectoryDAO.listDirectory(directory, user)
-    fileList = FileDAO.listFiles(directory, user)
+    dirList = DirectoryDAO.listDirectory(directory, request.user)
+    fileList = FileDAO.listFiles(directory, request.user)
     return JsonResponse({"directory": dirList, "file": fileList}, status=200)
 
 
