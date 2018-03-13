@@ -67,13 +67,9 @@ def test(request):
 
 @login_required
 def ls(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except JSONDecodeError:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-    dirId = data.get('dirId', '').strip()
-    user = request.user
-
+    dirId = request.GET.get("did", '')
+    if not dirId:
+        #dirId = TODO => get root dir ID
     try:
         directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
     except (ObjectDoesNotExist, PermissionDenied):
