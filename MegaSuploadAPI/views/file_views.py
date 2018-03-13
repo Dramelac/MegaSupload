@@ -7,7 +7,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, FileKeyDAO
+from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, FileKeyDAO, PermissionDAO
 from MegaSuploadAPI.forms import *
 
 
@@ -53,27 +53,6 @@ def download(request):
         return JsonResponse({"message": "Not found"}, status=404)
 
 
-@login_required
-def downloadPath(request):
-    path = request.GET.get("path")
-    file = request.GET.get("file")
-    try:
-        directory = DirectoryDAO.getDirectoryFromPath(path, request.user)
-    except (ObjectDoesNotExist, PermissionDenied):
-        return JsonResponse({"message": "Not found"}, status=404)
-    except FieldError:
-        return JsonResponse({"message": "Bad input"}, status=400)
-
-    # TODO add file DAO
-    try:
-        data = FileSystemDAO.get_file(directory, file, "")
-        response = HttpResponse(data, content_type=file.type)
-        response['Content-Disposition'] = 'inline; filename=' + file
-        return response
-    except ObjectDoesNotExist:
-        return JsonResponse({"message": "Not found"}, status=404)
-
-
 @csrf_exempt
 @login_required
 def test(request):
@@ -93,11 +72,11 @@ def ls(request):
         data = json.loads(request.body.decode("utf-8"))
     except JSONDecodeError:
         return JsonResponse({"message": "Bad JSON."}, status=400)
-    path = data.get('path', '').strip()
+    dirId = data.get('dirId', '').strip()
     user = request.user
 
     try:
-        directory = DirectoryDAO.getDirectoryFromPath(path, request.user)
+        directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
     except (ObjectDoesNotExist, PermissionDenied):
         return JsonResponse({"message": "Not found"}, status=404)
     except FieldError:
@@ -114,12 +93,15 @@ def addDirectory(request):
         data = json.loads(request.body.decode("utf-8"))
     except JSONDecodeError:
         return JsonResponse({"message": "Bad JSON."}, status=400)
-    path = data.get('path', '').strip()
+    dirId = data.get('dirId', '').strip()
     name = data.get('name', '').strip()
     user = request.user
 
     try:
-        directory = DirectoryDAO.getDirectoryFromPath(path, request.user)
+        directory = DirectoryDAO.getDirectoryFromId(dirId, user)
+        perm = PermissionDAO.getPermission(directory, user)
+        if not (perm.edit or perm.owner):
+            raise PermissionDenied
     except (ObjectDoesNotExist, PermissionDenied):
         return JsonResponse({"message": "Not found"}, status=404)
     except FieldError:

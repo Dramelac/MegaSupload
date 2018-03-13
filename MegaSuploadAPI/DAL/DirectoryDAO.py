@@ -1,6 +1,4 @@
-import re
-
-from django.core.exceptions import PermissionDenied, FieldError, ObjectDoesNotExist
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from MegaSuploadAPI.DAL import PermissionDAO
 from MegaSuploadAPI.models import Directory
@@ -17,6 +15,7 @@ def addDirectory(user, name, parent=None):
     return directory
 
 
+""" # Old deprecated method
 def getDirectoryFromPath(path, user):
     if not re.compile("^/").match(path):
         raise FieldError
@@ -34,6 +33,7 @@ def getDirectoryFromPath(path, user):
         return directory
     else:
         raise PermissionDenied
+"""
 
 
 def getDirectoryFromId(dirId, user):

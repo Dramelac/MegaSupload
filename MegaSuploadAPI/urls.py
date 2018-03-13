@@ -9,7 +9,6 @@ urlpatterns = [
     path('user/update_profile', users_views.update_profile),
     path('file/upload', file_views.upload, name="upload"),
     path('file/download', file_views.download),
-    path('file/my_download', file_views.downloadPath),
     path('file/list_item', file_views.ls),
     path('file/add_dir', file_views.addDirectory),
     path('file/rename_dir', file_views.renameDirectory),
