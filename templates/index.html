@@ -21,11 +21,11 @@
                 <div class="sk-circle12 sk-child"></div>
             </div>
             <div v-for="dir in directories" v-cloak class="directory" v-on:click="openDir(dir.id, dir.name)">
-                <i class="fas fa-folder"></i>
+                <i class="fas fa-lg fa-folder"></i>
                 <span>[[ dir.name ]]</span>
             </div>
             <div v-for="file in files" v-cloak class="file" v-on:click="fileClicked(file.id, file.directory_id)">
-                <i class="far fa-file"></i>
+                <i class="far fa-lg" :class="getFileIcon(file.type)"></i>
                 <span>[[ file.name ]]</span>
             </div>
         </div>
