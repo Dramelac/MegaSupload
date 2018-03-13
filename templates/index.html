@@ -5,7 +5,12 @@
     <h1>Home Page !</h1>
     {% if user.is_authenticated %}
         <div id="fileApp">
-            [[message]]
+            <div v-for="dir in directories">
+                Directory: [[ dir.name ]]
+            </div>
+            <div v-for="file in files">
+                File: [[ file.name ]]
+            </div>
         </div>
     {% endif %}
 {% endblock %}

@@ -68,9 +68,8 @@ def test(request):
 @login_required
 def ls(request):
     dirId = request.GET.get("did", '')
-    user = request.user
     if not dirId:
-        directory = DirectoryDAO.getRootDirectory(user)
+        directory = DirectoryDAO.getRootDirectory(request.user)
     else:
         try:
             directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
