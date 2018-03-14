@@ -4,29 +4,34 @@
 {% block body %}
     <h1>Home Page !</h1>
     {% if user.is_authenticated %}
-        <div id="path">/</div>
         <div id="fileApp">
-            <div class="sk-circle" v-show="loader">
-                <div class="sk-circle1 sk-child"></div>
-                <div class="sk-circle2 sk-child"></div>
-                <div class="sk-circle3 sk-child"></div>
-                <div class="sk-circle4 sk-child"></div>
-                <div class="sk-circle5 sk-child"></div>
-                <div class="sk-circle6 sk-child"></div>
-                <div class="sk-circle7 sk-child"></div>
-                <div class="sk-circle8 sk-child"></div>
-                <div class="sk-circle9 sk-child"></div>
-                <div class="sk-circle10 sk-child"></div>
-                <div class="sk-circle11 sk-child"></div>
-                <div class="sk-circle12 sk-child"></div>
-            </div>
-            <div v-for="dir in directories" v-cloak class="directory" v-on:click="openDir(dir.id, dir.name)">
-                <i class="fas fa-lg fa-folder"></i>
-                <span>[[ dir.name ]]</span>
-            </div>
-            <div v-for="file in files" v-cloak class="file" v-on:click="fileClicked(file.id, file.directory_id)">
-                <i class="far fa-lg" :class="getFileIcon(file.type)"></i>
-                <span>[[ file.name ]]</span>
+            <ol class="breadcrumb" id="path">
+                <li class="breadcrumb-item"><a href="#" v-on:click="openDir()"><i class="fas fa-home"></i></a></li>
+                <li class="breadcrumb-item" v-for="dir in paths" v-cloak v-show="dir.show"><a href="#" v-on:click="openDir(dir.id, dir.name)" >[[ dir.name ]]</a></li>
+            </ol>
+            <div id="filesContainer">
+                <div class="sk-circle" v-show="loader">
+                    <div class="sk-circle1 sk-child"></div>
+                    <div class="sk-circle2 sk-child"></div>
+                    <div class="sk-circle3 sk-child"></div>
+                    <div class="sk-circle4 sk-child"></div>
+                    <div class="sk-circle5 sk-child"></div>
+                    <div class="sk-circle6 sk-child"></div>
+                    <div class="sk-circle7 sk-child"></div>
+                    <div class="sk-circle8 sk-child"></div>
+                    <div class="sk-circle9 sk-child"></div>
+                    <div class="sk-circle10 sk-child"></div>
+                    <div class="sk-circle11 sk-child"></div>
+                    <div class="sk-circle12 sk-child"></div>
+                </div>
+                <div v-for="dir in directories" v-cloak class="directory" v-show="!loader" v-on:click="openDir(dir.id, dir.name)">
+                    <i class="fas fa-lg fa-folder"></i>
+                    <span>[[ dir.name ]]</span>
+                </div>
+                <div v-for="file in files" v-cloak class="file" v-show="!loader" v-on:click="fileClicked(file.id, file.directory_id)">
+                    <i class="far fa-lg" :class="getFileIcon(file.type)"></i>
+                    <span>[[ file.name ]]</span>
+                </div>
             </div>
         </div>
     {% endif %}

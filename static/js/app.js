@@ -1,7 +1,7 @@
 function getFileIcon(mimeType) {
     var iconClasses = {
         'image': 'fa-file-image',
-        'audio/mpeg': 'fa-file-audio',
+        'audio': 'fa-file-audio',
         'video': 'fa-file-video',
         'application/pdf': 'fa-file-pdf',
         'application/msword': 'fa-file-word',
@@ -20,12 +20,18 @@ function getFileIcon(mimeType) {
         'application/gzip': 'fa-file-archive',
         'application/zip': 'fa-file-archive',
     };
-
-    return iconClasses[mimeType] || 'fa-file';
+    for(var key in iconClasses){
+        if (new RegExp(key).test(mimeType)) {
+            return iconClasses[key]
+        }
+    }
+    return 'fa-file';
 }
 
 async function loadDir(dirId, dirName) {
     this.loader = true;
+    this.files = [];
+    this.directories = [];
     var data = await $.getJSON('/api/file/list_item?did=' + (dirId || ''));
     this.files = data.file;
     this.directories = data.directory.filter(function (d) {
@@ -34,12 +40,21 @@ async function loadDir(dirId, dirName) {
         return a - b;
     });
     this.loader = false;
-    if (dirName === "..") {
-        this.path.pop();
-    } else if (dirName && dirName !== ".") {
-        this.path.push(dirName + "/")
+    var curId = data.directory.find(function (d) {
+        return d.type === "current";
+    }).id;
+    var curIndex = this.paths.findIndex(function (d) {
+        return d.id === curId;
+    });
+    if (curIndex > -1) {
+        this.paths.length = curIndex + 1;
+    } else {
+        this.paths.push({
+            name: dirName,
+            id: curId,
+            show: !!dirId
+        })
     }
-    $("#path").text(this.path.join(""))
 }
 var fileManager = new Vue({
     el: '#fileApp',
@@ -48,7 +63,7 @@ var fileManager = new Vue({
         directories: [],
         files: [],
         loader: true,
-        path: ["/"]
+        paths: []
     },
     mounted: loadDir,
     methods: {

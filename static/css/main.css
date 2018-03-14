@@ -1,9 +1,9 @@
 [v-cloak] {
     display: none;
 }
-#fileApp {
+#filesContainer {
     padding: 20px;
-    background: #d7d7d7;
+    background: #e3e3e3;
     height: calc(100vh - 140px);
     min-height: 300px;
 }
@@ -17,8 +17,8 @@
     background: #005cbf;
 }
 #path {
-    padding: 5px;
-    background: #d7d7d7;
+    padding: 8px 20px;
+    background: #e3e3e3;
     margin: 10px 0 10px 0;
     border-radius: 10px;
 }
