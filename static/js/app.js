@@ -56,6 +56,20 @@ async function loadDir(dirId, dirName) {
         })
     }
 }
+
+function newPLayer(playerType, src, mime) {
+    var el = document.createElement(playerType);
+    el.setAttribute('controls', true);
+    el.setAttribute('autoplay', true);
+    var source = document.createElement('source');
+    source.setAttribute('src', src);
+    source.setAttribute('type', mime);
+    el.appendChild(source);
+    return el;
+}
+$('#globalModal').on('hidden.bs.modal', function (e) {
+  $('#globalModal .modal-body').html('');
+})
 var fileManager = new Vue({
     el: '#fileApp',
     delimiters: ['[[', ']]'],
@@ -67,8 +81,26 @@ var fileManager = new Vue({
     },
     mounted: loadDir,
     methods: {
-        fileClicked: function (fileId, dirId) {
-            window.open('/api/file/download?did=' + dirId + '&fid=' + fileId,'_blank');
+        fileClicked: function (fileId) {
+            var file = this.files.find(function (f) {
+                return f.id == fileId;
+            })
+            var link = '/api/file/download?did=' + file.directory_id + '&fid=' + fileId;
+            if (/image|mp4|audio/.test(file.type)) {
+                if (/image/.test(file.type)) {
+                    var el = new Image();
+                    el.src = link;
+                } else if (/mp4/.test(file.type)) {
+                    var el =newPLayer('video', link, file.type);
+                } else if (/audio/.test(file.type)) {
+                    var el =newPLayer('audio', link, file.type);
+                }
+                $("#globalModal .modal-title").text(file.name)
+                $('#globalModal .modal-body').html(el);
+                $("#globalModal").modal('show')
+            } else {
+                window.open(link,'_blank');
+            }
         },
         openDir: loadDir,
         getFileIcon: getFileIcon

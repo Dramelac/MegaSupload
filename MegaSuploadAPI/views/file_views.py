@@ -53,7 +53,7 @@ def download(request):
     try:
         file_data = FileSystemDAO.get_file(directory, file.id, "")  # TODO add FileKey
         response = HttpResponse(file_data, content_type=file.type)
-        response['Content-Disposition'] = 'inline; filename=' + file.name
+        response['Content-Disposition'] = 'inline; filename="' + file.name + '"'
         return response
     except ObjectDoesNotExist:
         return JsonResponse({"message": "Not found"}, status=404)
