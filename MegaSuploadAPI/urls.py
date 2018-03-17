@@ -16,5 +16,6 @@ urlpatterns = [
     path('file/move_dir', file_views.moveDir),
     path('file/move_file', file_views.moveFile),
     path('file/check_file', file_views.checkReplacement),
+    path('file/get_key', file_views.getFileKey),
     path('test', file_views.test),
 ]

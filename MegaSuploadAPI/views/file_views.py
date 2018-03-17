@@ -7,7 +7,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, PermissionDAO
+from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, PermissionDAO, FileKeyDAO
 from MegaSuploadAPI.forms import *
 
 
@@ -36,6 +36,7 @@ def upload(request):
 
 
 @login_required
+@require_http_methods(["POST"])
 def checkReplacement(request):
     try:
         data = json.loads(request.body.decode("utf-8"))
@@ -52,6 +53,7 @@ def checkReplacement(request):
 def download(request):
     dirId = request.GET.get("did")
     fileId = request.GET.get("fid")
+    key = request.GET.get("k")
     try:
         directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
         file = FileDAO.getFileFromId(fileId, request.user)
@@ -61,7 +63,7 @@ def download(request):
         return JsonResponse({"message": "Bad input"}, status=400)
 
     try:
-        file_data = FileSystemDAO.get_file(directory, file.id, "")  # TODO add FileKey
+        file_data = FileSystemDAO.get_file(directory, file.id, key)
         response = HttpResponse(file_data, content_type=file.type)
         response['Content-Disposition'] = 'inline; filename="' + file.name + '"'
         return response
@@ -219,4 +221,18 @@ def moveFile(request):
     FileDAO.move(file, directory, user)
     return JsonResponse({"message": "Success"}, status=200)
 
-# TODO GetFileKey
+
+@login_required
+@require_http_methods(["POST"])
+def getFileKey(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except JSONDecodeError:
+        return JsonResponse({"message": "Bad JSON."}, status=400)
+    fileId = data.get('fileId', '').strip()
+    user = request.user
+    try:
+        fk = FileKeyDAO.getFileKey(user, fileId)
+        return JsonResponse({"key": fk.key[2:-1]}, status=200)
+    except ObjectDoesNotExist:
+        return JsonResponse({"message": "Not found"}, status=404)
