@@ -15,5 +15,6 @@ urlpatterns = [
     path('file/rename_file', file_views.renameFile),
     path('file/move_dir', file_views.moveDir),
     path('file/move_file', file_views.moveFile),
+    path('file/check_file', file_views.checkReplacement),
     path('test', file_views.test),
 ]

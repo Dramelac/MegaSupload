@@ -35,7 +35,17 @@ def upload(request):
     return JsonResponse({"message": "Error invalid input."}, status=400)
 
 
-# TODO add isKeyNeeded method before upload
+@login_required
+def checkReplacement(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except JSONDecodeError:
+        return JsonResponse({"message": "Bad JSON."}, status=400)
+    dirId = data.get('dirId', '').strip()
+    fileName = data.get('fname', '').strip()
+    user = request.user
+
+    return JsonResponse({"isFileExist": FileDAO.isFileExist(fileName, dirId, user)}, status=200)
 
 
 @login_required
@@ -155,8 +165,11 @@ def renameFile(request):
         return JsonResponse({"message": "Not found"}, status=404)
     except FieldError:
         return JsonResponse({"message": "Bad input"}, status=400)
+    try:
+        FileDAO.rename(file, name, user)
+    except (PermissionDenied, FileExistsError):
+        return JsonResponse({"message": "Not found"}, status=404)
 
-    FileDAO.rename(file, name, user)
     return JsonResponse({"message": "Success"}, status=200)
 
 

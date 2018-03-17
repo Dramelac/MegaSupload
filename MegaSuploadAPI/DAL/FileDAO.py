@@ -41,7 +41,18 @@ def uploadFile(file, directory, user, key=None):
         _newFile(file, directory, user)
 
 
+def isFileExist(fileName, directoryId, user):
+    try:
+        result = File.objects.get(directory=directoryId, name=fileName)
+        perm = PermissionDAO.getPermission(result, user)
+        return perm is not None and perm.read
+    except ObjectDoesNotExist:
+        return False
+
+
 def rename(file, newname, user):
+    if isFileExist(newname, file.directory, user):
+        raise FileExistsError
     perm = PermissionDAO.getPermission(file, user)
     if perm.owner or perm.edit:
         file.name = newname
