@@ -3,6 +3,10 @@
 
 {% block body %}
     {% if user.is_authenticated %}
+        <div id="buttonsContainer">
+        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#uploadModal"><i class="fas fa-upload"></i> File</button>
+        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#newDirModal"><i class="fas fa-plus-circle"></i> Folder</button>
+        </div>
         <div id="fileApp">
             <ol class="breadcrumb" id="path">
                 <li class="breadcrumb-item"><a href="#" v-on:click="openDir()"><i class="fas fa-home"></i></a></li>
@@ -43,9 +47,53 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
+                    <div class="modal-body"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="uploadModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="uploadModal" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Upload file</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                     <div class="modal-body">
+                        <div id="dropbox">
+                            <i class="fas fa-upload" style="font-size: 60px;margin-bottom: 20px;"></i><br>
+                            <span id="uploadFileName"></span>
+                        </div>
+                        <input type="file" id="uploadInput" style="margin-left: 3%;">
+                        <progress max="100" value="0" id="uploadProgress"></progress>
                     </div>
                     <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="uploadBtn">Upload</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="newDirModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="newDirModal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create folder</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                       Folder name : <input type="text" id="newDirName" placeholder="Name">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="newDirBtn">Create</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>

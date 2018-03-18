@@ -28,12 +28,6 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="{% url "home" %}">Home <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url "upload-form" %}">Upload</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Disabled</a>
-                </li>
             </ul>
             <ul class="navbar-nav navbar-right">
                 {% if not user.is_authenticated %}

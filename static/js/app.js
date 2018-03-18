@@ -1,3 +1,5 @@
+var currentDirId;
+
 function getFileIcon(mimeType) {
     var iconClasses = {
         'image': 'fa-file-image',
@@ -20,7 +22,7 @@ function getFileIcon(mimeType) {
         'application/gzip': 'fa-file-archive',
         'application/zip': 'fa-file-archive',
     };
-    for(var key in iconClasses){
+    for (var key in iconClasses) {
         if (new RegExp(key).test(mimeType)) {
             return iconClasses[key]
         }
@@ -40,20 +42,42 @@ async function loadDir(dirId, dirName) {
         return a - b;
     });
     this.loader = false;
-    var curId = data.directory.find(function (d) {
+    currentDirId = data.directory.find(function (d) {
         return d.type === "current";
     }).id;
     var curIndex = this.paths.findIndex(function (d) {
-        return d.id === curId;
+        return d.id === currentDirId;
     });
     if (curIndex > -1) {
         this.paths.length = curIndex + 1;
     } else {
         this.paths.push({
             name: dirName,
-            id: curId,
+            id: currentDirId,
             show: !!dirId
         })
+    }
+}
+
+function fileClicked(fileId) {
+    var file = this.files.find(function (f) {
+        return f.id == fileId;
+    })
+    var link = '/api/file/download?did=' + file.directory_id + '&fid=' + fileId;
+    if (/image\/|mp4|audio\//.test(file.type)) {
+        if (/image/.test(file.type)) {
+            var el = new Image();
+            el.src = link;
+        } else if (/mp4/.test(file.type)) {
+            var el = newPLayer('video', link, file.type);
+        } else if (/audio/.test(file.type)) {
+            var el = newPLayer('audio', link, file.type);
+        }
+        $("#globalModal .modal-title").text(file.name)
+        $('#globalModal .modal-body').html(el);
+        $("#globalModal").modal('show')
+    } else {
+        window.open(link, '_blank');
     }
 }
 
@@ -67,9 +91,7 @@ function newPLayer(playerType, src, mime) {
     el.appendChild(source);
     return el;
 }
-$('#globalModal').on('hidden.bs.modal', function (e) {
-  $('#globalModal .modal-body').html('');
-})
+
 var fileManager = new Vue({
     el: '#fileApp',
     delimiters: ['[[', ']]'],
@@ -81,28 +103,105 @@ var fileManager = new Vue({
     },
     mounted: loadDir,
     methods: {
-        fileClicked: function (fileId) {
-            var file = this.files.find(function (f) {
-                return f.id == fileId;
-            })
-            var link = '/api/file/download?did=' + file.directory_id + '&fid=' + fileId;
-            if (/image|mp4|audio/.test(file.type)) {
-                if (/image/.test(file.type)) {
-                    var el = new Image();
-                    el.src = link;
-                } else if (/mp4/.test(file.type)) {
-                    var el =newPLayer('video', link, file.type);
-                } else if (/audio/.test(file.type)) {
-                    var el =newPLayer('audio', link, file.type);
-                }
-                $("#globalModal .modal-title").text(file.name)
-                $('#globalModal .modal-body').html(el);
-                $("#globalModal").modal('show')
-            } else {
-                window.open(link,'_blank');
-            }
-        },
+        fileClicked: fileClicked,
         openDir: loadDir,
         getFileIcon: getFileIcon
+    }
+});
+
+$('#globalModal').on('hidden.bs.modal', function (e) {
+    $('#globalModal .modal-body').html('');
+});
+
+$('#uploadModal').on('hidden.bs.modal', function (e) {
+    $('#uploadFileName').html('');
+    $('#dropbox').removeClass("drapActive");
+    $("#uploadInput").val("");
+    $('#uploadProgress').hide()
+});
+
+$('#dropbox').on("dragenter", function (e) {
+    e.preventDefault();
+    $('#dropbox').addClass("drapActive");
+});
+
+$('#dropbox').on("dragleave", function (e) {
+    e.preventDefault();
+    $('#dropbox').removeClass("drapActive");
+});
+$(document).on("dragover", function (e) {
+    e.preventDefault();
+});
+$(document).on("drop", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $('#dropbox').addClass("drapActive");
+    var files = e.originalEvent.dataTransfer.files;
+    $('#uploadFileName').text(files[0].name);
+    $("#uploadInput").prop("files", files);
+    $('#uploadModal').modal('show');
+});
+
+function progress(e) {
+    if (e.lengthComputable) {
+        var percentage = (e.loaded * 100) / e.total;
+    }
+}
+
+$("#uploadBtn").on('click', async function () {
+    var reqFileExist = await $.post('/api/file/check_file', JSON.stringify({
+        'dirId': currentDirId,
+        'fname': $("#uploadInput")[0].files[0].name
+    }));
+    $('#uploadProgress').val(0).show();
+    if (reqFileExist.isFileExist) {
+
+    } else {
+        var data = new FormData();
+        data.append('file', $("#uploadInput")[0].files[0]);
+        data.append('dirId', currentDirId);
+        $.ajax({
+            type: 'POST',
+            url: '/api/file/upload',
+            data: data,
+            xhr: function () {
+                var myXhr = $.ajaxSettings.xhr();
+                if (myXhr.upload) {
+                    myXhr.upload.addEventListener('progress', function (e) {
+                        if (e.lengthComputable) {
+                            var percentage = (e.loaded * 100) / e.total;
+                            $('#uploadProgress').val(percentage);
+                        }
+                    }, false);
+                }
+                return myXhr;
+            },
+            cache: false,
+            contentType: false,
+            processData: false,
+
+            success: function () {
+                $('#uploadModal').modal('hide');
+                fileManager.openDir(currentDirId)
+            },
+
+            error: function (err) {
+                console.log(err);
+                alert(err.responseText || err)
+            }
+        });
+    }
+});
+
+$('#newDirBtn').on('click', async function () {
+    try {
+        await $.post('/api/file/add_dir', JSON.stringify({
+            name: $('#newDirName').val(),
+            dirId: currentDirId
+        }))
+        $('#newDirModal').modal('hide');
+        fileManager.openDir(currentDirId)
+    } catch (err) {
+        alert("Error on folder creation");
     }
 });
