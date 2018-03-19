@@ -14,11 +14,11 @@ def newFileKey(owner, file):
     # Will raise NotImplementedError if random is not available on the system
 
     uncrypted_key = binascii.hexlify(os.urandom(20))
-    pub_key = RSA.import_key(owner.pub_key)
+    pub_key = RSA.import_key(owner.pub_key.encode('utf8'))
     cipher_rsa = PKCS1_OAEP.new(pub_key)
     key = base64.b64encode(cipher_rsa.encrypt(uncrypted_key))
 
-    FileKey.objects.create(owner=owner, file=file, key=key)
+    FileKey.objects.create(owner=owner, file=file, key=key.decode("utf8"))
     return uncrypted_key
 
 

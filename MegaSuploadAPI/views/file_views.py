@@ -44,9 +44,10 @@ def checkReplacement(request):
         return JsonResponse({"message": "Bad JSON."}, status=400)
     dirId = data.get('dirId', '').strip()
     fileName = data.get('fname', '').strip()
-    user = request.user
-
-    return JsonResponse({"isFileExist": FileDAO.isFileExist(fileName, dirId, user)}, status=200)
+    return JsonResponse({
+        "isFileExist": FileDAO.isFileExist(fileName, dirId, request.user),
+        "fileId": FileDAO.getFileIdFromName(fileName, dirId, request.user)
+    }, status=200)
 
 
 @login_required
@@ -233,6 +234,6 @@ def getFileKey(request):
     user = request.user
     try:
         fk = FileKeyDAO.getFileKey(user, fileId)
-        return JsonResponse({"key": fk.key[2:-1]}, status=200)
+        return JsonResponse({"key": fk.key}, status=200)
     except ObjectDoesNotExist:
         return JsonResponse({"message": "Not found"}, status=404)

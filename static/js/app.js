@@ -154,43 +154,48 @@ $("#uploadBtn").on('click', async function () {
         'fname': $("#uploadInput")[0].files[0].name
     }));
     $('#uploadProgress').val(0).show();
+    var fileKeyDecrypted = "";
     if (reqFileExist.isFileExist) {
-
-    } else {
-        var data = new FormData();
-        data.append('file', $("#uploadInput")[0].files[0]);
-        data.append('dirId', currentDirId);
-        $.ajax({
-            type: 'POST',
-            url: '/api/file/upload',
-            data: data,
-            xhr: function () {
-                var myXhr = $.ajaxSettings.xhr();
-                if (myXhr.upload) {
-                    myXhr.upload.addEventListener('progress', function (e) {
-                        if (e.lengthComputable) {
-                            var percentage = (e.loaded * 100) / e.total;
-                            $('#uploadProgress').val(percentage);
-                        }
-                    }, false);
-                }
-                return myXhr;
-            },
-            cache: false,
-            contentType: false,
-            processData: false,
-
-            success: function () {
-                $('#uploadModal').modal('hide');
-                fileManager.openDir(currentDirId)
-            },
-
-            error: function (err) {
-                console.log(err);
-                alert(err.responseText || err)
-            }
-        });
+        var reqFileKey = await $.post('/api/file/get_key', JSON.stringify({
+            'fileId': reqFileExist.fileId
+        }));
+        var privateKey = forge.pki.privateKeyFromPem(localStorage.priv_key);
+        fileKeyDecrypted = privateKey.decrypt(forge.util.decode64(reqFileKey.key), 'RSA-OAEP');
     }
+    var data = new FormData();
+    data.append('file', $("#uploadInput")[0].files[0]);
+    data.append('dirId', currentDirId);
+    data.append('key', fileKeyDecrypted);
+    $.ajax({
+        type: 'POST',
+        url: '/api/file/upload',
+        data: data,
+        xhr: function () {
+            var myXhr = $.ajaxSettings.xhr();
+            if (myXhr.upload) {
+                myXhr.upload.addEventListener('progress', function (e) {
+                    if (e.lengthComputable) {
+                        var percentage = (e.loaded * 100) / e.total;
+                        $('#uploadProgress').val(percentage);
+                    }
+                }, false);
+            }
+            return myXhr;
+        },
+        cache: false,
+        contentType: false,
+        processData: false,
+
+        success: function () {
+            $('#uploadModal').modal('hide');
+            fileManager.openDir(currentDirId)
+        },
+
+        error: function (err) {
+            console.log(err);
+            alert(err.responseText || err)
+        }
+    });
 });
 
 $('#newDirBtn').on('click', async function () {

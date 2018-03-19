@@ -37,12 +37,6 @@
                 success: function (res) {
                     localStorage.priv_key = res.priv_key;
                     localStorage.pub_key = res.pub_key;
-                    var privateKey = forge.pki.privateKeyFromPem(localStorage.priv_key);
-                    var publicKey = forge.pki.publicKeyFromPem(localStorage.pub_key);
-                    var encrypted = publicKey.encrypt("coucou c'est moi\nnewline");
-                    var decrypted = privateKey.decrypt(encrypted);
-                    console.log(encrypted);
-                    console.log(decrypted);
                     var regex = window.location.search.substr(1).match(/next=([a-z\/]+)\&?/);
                     window.location = regex ? regex[1] || "/" : "/";
                 },

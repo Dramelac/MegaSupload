@@ -51,7 +51,7 @@ def isFileExist(fileName, directoryId, user):
 
 
 def rename(file, newname, user):
-    if isFileExist(newname, file.directory, user):
+    if not isFileExist(newname, file.directory, user):
         raise FileExistsError
     perm = PermissionDAO.getPermission(file, user)
     if perm.owner or perm.edit:
@@ -102,3 +102,14 @@ def remove(fileId, user):
     if perm is not None and perm.owner:
         PermissionDAO.remove(user, user, file)
         file.delete()
+
+
+def getFileIdFromName(fileName, directoryId, user):
+    try:
+        file = File.objects.get(directory=directoryId, name=fileName)
+        perm = PermissionDAO.getPermission(file, user)
+        if perm is not None and perm.read:
+            return file.id
+
+    except ObjectDoesNotExist:
+        return None
