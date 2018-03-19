@@ -9,6 +9,8 @@ class User(AbstractUser):
     space_allowed = models.IntegerField(default=30)
     pub_key = models.TextField()
     encrypted_priv_key = models.TextField()
+    data_used = models.BigIntegerField(default=0)
+    max_data_allowed = models.BigIntegerField(default=31457280)
 
 
 class Directory(models.Model):
@@ -37,6 +39,7 @@ class File(models.Model):
     directory = models.ForeignKey(Directory, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     type = models.CharField(max_length=255)
+    size = models.BigIntegerField()
 
     def __str__(self):
         return "%s - %s" % (self.directory.getFullPath(), self.name)

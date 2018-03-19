@@ -8,14 +8,23 @@ from MegaSuploadAPI.models import File
 
 
 def _newFile(file, directory, user):
-    build_file = File.objects.create(directory=directory, name=file.name, type=file.content_type)
+    if user.data_used + file.size > user.max_data_allowed:
+        raise PermissionError
+    build_file = File.objects.create(directory=directory, name=file.name, type=file.content_type, size=file.size)
     PermissionDAO.inheritPermission(directory, user, build_file)
 
     key = FileKeyDAO.newFileKey(owner=user, file=build_file)
     FileSystemDAO.store_file(directory, file, build_file.id, key)
 
+    # TODO check data relative to owner
+    user.data_used += file.size
+    user.save()
+
 
 def _updateFile(file, file_fs, directory, user, key):
+    oldSize = file_fs.size
+    if user.data_used - oldSize + file.size > user.max_data_allowed:
+        raise PermissionError
     perm = PermissionDAO.getPermission(file_fs, user)
     dirPerm = PermissionDAO.getPermission(directory, user)
 
@@ -23,7 +32,15 @@ def _updateFile(file, file_fs, directory, user, key):
             (dirPerm is not None and (dirPerm.owner or dirPerm.edit)):
         FileSystemDAO.store_file(directory, file, file_fs.id, key)
     else:
-        raise PermissionError
+        raise PermissionDenied
+
+    # TODO check data relative to owner
+    user.data_used -= oldSize
+    user.data_used += file.size
+    user.save()
+
+    file_fs.size = file.size
+    file_fs.save()
 
 
 # This method permit to avoid name duplicate on a same directory
@@ -101,7 +118,12 @@ def remove(fileId, user):
     perm = PermissionDAO.getPermission(file, user)
     if perm is not None and perm.owner:
         PermissionDAO.remove(user, user, file)
+        dataSize = file.size
         file.delete()
+        user.data_used += dataSize
+        if user.data_used < 0:
+            user.data_used = 0
+        user.save()
 
 
 def getFileIdFromName(fileName, directoryId, user):

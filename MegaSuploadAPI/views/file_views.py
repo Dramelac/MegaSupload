@@ -30,6 +30,8 @@ def upload(request):
             FileDAO.uploadFile(file, directory, request.user, key)
         except PermissionDenied:
             return JsonResponse({"message": "Not found"}, status=404)
+        except PermissionError:
+            return JsonResponse({"message": "Not enough data space"}, status=400)
 
         return JsonResponse({"message": "Success."}, status=200)
     return JsonResponse({"message": "Error invalid input."}, status=400)
