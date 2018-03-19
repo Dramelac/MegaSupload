@@ -7,6 +7,7 @@ urlpatterns = [
     path('auth/login', users_views.login),
     path('auth/logout', users_views.logout, name="logout"),
     path('user/update_profile', users_views.update_profile),
+    path('user/ratio', users_views.get_ratio),
     path('file/upload', file_views.upload, name="upload"),
     path('file/download', file_views.download),
     path('file/list_item', file_views.ls),

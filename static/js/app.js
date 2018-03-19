@@ -1,5 +1,11 @@
 var currentDirId;
 
+Vue.filter('prettyBytes', function (num) {
+    if (!num) return 0;
+    var i = Math.floor( Math.log(num) / Math.log(1024) );
+    return ( num / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+});
+
 function getFileIcon(mimeType) {
     var iconClasses = {
         'image': 'fa-file-image',
@@ -109,6 +115,25 @@ var fileManager = new Vue({
     }
 });
 
+async function loadDataCounter() {
+    var req = await $.getJSON('/api/user/ratio');
+    this.dataUsed = req.dataUsed;
+    this.maxDataAllowed = req.maxDataAllowed;
+}
+
+var dataCounter = new Vue({
+    el: '#dataUsed',
+    delimiters: ['[[', ']]'],
+    data: {
+        dataUsed: 0,
+        maxDataAllowed: 0
+    },
+    mounted: loadDataCounter,
+    methods: {
+        loadDataCounter: loadDataCounter,
+    }
+});
+
 $('#globalModal').on('hidden.bs.modal', function (e) {
     $('#globalModal .modal-body').html('');
 });
@@ -119,6 +144,11 @@ $('#uploadModal').on('hidden.bs.modal', function (e) {
     $("#uploadInput").val("");
     $('#uploadProgress').hide()
 });
+
+$('#newDirModal').on('show.bs.modal', function (e) {
+    $('#newDirName').val('');
+});
+
 
 $('#dropbox').on("dragenter", function (e) {
     e.preventDefault();
@@ -188,12 +218,12 @@ $("#uploadBtn").on('click', async function () {
 
         success: function () {
             $('#uploadModal').modal('hide');
-            fileManager.openDir(currentDirId)
+            fileManager.openDir(currentDirId);
+            dataCounter.loadDataCounter();
         },
 
         error: function (err) {
-            console.log(err);
-            alert(err.responseText || err)
+            alert(err.responseJSON.message)
         }
     });
 });
@@ -206,7 +236,8 @@ $('#newDirBtn').on('click', async function () {
         }))
         $('#newDirModal').modal('hide');
         fileManager.openDir(currentDirId)
+        dataCounter.loadDataCounter();
     } catch (err) {
-        alert("Error on folder creation");
+        alert(err.responseJSON.message);
     }
 });

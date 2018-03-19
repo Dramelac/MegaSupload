@@ -10,7 +10,7 @@ class User(AbstractUser):
     pub_key = models.TextField()
     encrypted_priv_key = models.TextField()
     data_used = models.BigIntegerField(default=0)
-    max_data_allowed = models.BigIntegerField(default=31457280)
+    max_data_allowed = models.BigIntegerField(default=32212254720)
 
 
 class Directory(models.Model):

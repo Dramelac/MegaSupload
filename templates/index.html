@@ -2,6 +2,10 @@
 {% load static %}
 
 {% block body %}
+    {% if not user.is_authenticated %}
+        <h2>Welcome ! Please log-in to discover our great features !</h2>
+    {% endif %}
+
     {% if user.is_authenticated %}
         <div id="buttonsContainer">
         <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#uploadModal"><i class="fas fa-upload"></i> File</button>

@@ -35,7 +35,7 @@
                     <li class="nav-item"><a class="btn btn-outline-warning" href="{% url "register" %}">Register</a></li>
                 {% endif %}
                 {% if user.is_authenticated %}
-                    <li class="nav-item"><span class="nav-link active">{{ user.data_used }} / {{ user.max_data_allowed }}</span></li>
+                    <li class="nav-item"><span class="nav-link active" id="dataUsed" v-cloak>[[ dataUsed | prettyBytes ]] / [[ maxDataAllowed | prettyBytes ]]</span></li>
                     <li class="nav-item"><a class="nav-link active" href="{% url "profile" %}">{{ user.username }}</a></li>
                     <li class="nav-item"><a class="btn btn-outline-dark" href="#" onclick="delete localStorage.priv_key;delete localStorage.pub_key;window.location='{% url "logout" %}'">Déconnexion</a></li>
                 {% endif %}

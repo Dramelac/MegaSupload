@@ -130,3 +130,11 @@ def update_profile(request):
     return JsonResponse({
         "message": "Update successful."
     }, status=200)
+
+
+@login_required
+def get_ratio(request):
+    return JsonResponse({
+        'dataUsed': request.user.data_used,
+        'maxDataAllowed': request.user.max_data_allowed
+    }, status=200)
