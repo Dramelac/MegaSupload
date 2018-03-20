@@ -1,4 +1,5 @@
 import json
+import urllib
 from json import JSONDecodeError
 
 from django.contrib.auth.decorators import login_required
@@ -68,7 +69,7 @@ def download(request):
     try:
         file_data = FileSystemDAO.get_file(directory, file.id, key)
         response = HttpResponse(file_data, content_type=file.type)
-        response['Content-Disposition'] = 'inline; filename="' + file.name + '"'
+        response['Content-Disposition'] = 'inline; filename*=UTF-8\'\'%s' % urllib.parse.quote(file.name.encode('utf-8'))
         return response
     except ObjectDoesNotExist:
         return JsonResponse({"message": "Not found"}, status=404)
@@ -158,24 +159,22 @@ def renameFile(request):
         data = json.loads(request.body.decode("utf-8"))
     except JSONDecodeError:
         return JsonResponse({"message": "Bad JSON."}, status=400)
-    elementId = data.get('uuid', '').strip()
+    fileId = data.get('fileId', '').strip()
     name = data.get('name', '').strip()
-    if not elementId or not name:
+    if not fileId or not name:
         return JsonResponse({"message": "Bad input"}, status=400)
-    user = request.user
 
     try:
-        file = FileDAO.getFileFromId(elementId, request.user)
+        file = FileDAO.getFileFromId(fileId, request.user)
     except (ObjectDoesNotExist, PermissionDenied):
         return JsonResponse({"message": "Not found"}, status=404)
     except FieldError:
         return JsonResponse({"message": "Bad input"}, status=400)
     try:
-        FileDAO.rename(file, name, user)
+        FileDAO.rename(file, name, request.user)
+        return JsonResponse({"message": "Success"}, status=200)
     except (PermissionDenied, FileExistsError):
         return JsonResponse({"message": "Not found"}, status=404)
-
-    return JsonResponse({"message": "Success"}, status=200)
 
 
 @login_required
@@ -238,4 +237,18 @@ def getFileKey(request):
         fk = FileKeyDAO.getFileKey(user, fileId)
         return JsonResponse({"key": fk.key}, status=200)
     except ObjectDoesNotExist:
+        return JsonResponse({"message": "Not found"}, status=404)\
+
+@login_required
+@require_http_methods(["POST"])
+def removeFile(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except JSONDecodeError:
+        return JsonResponse({"message": "Bad JSON."}, status=400)
+    fileId = data.get('fileId', '').strip()
+    try:
+        FileDAO.remove(fileId, request.user)
+        return JsonResponse({"message": 'File removed'}, status=200)
+    except (ObjectDoesNotExist, PermissionDenied):
         return JsonResponse({"message": "Not found"}, status=404)

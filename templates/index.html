@@ -32,28 +32,52 @@
                     <div class="sk-circle12 sk-child"></div>
                 </div>
                 <div v-for="dir in directories" v-cloak class="directory" v-show="!loader" v-on:click="openDir(dir.id, dir.name)">
-                    <i class="fas fa-lg fa-folder"></i>
+                    <i class="fas fa-lg fa-folder fileIcon"></i>
                     <span>[[ dir.name ]]</span>
                 </div>
                 <div v-for="file in files" v-cloak class="file" v-show="!loader" v-on:click="fileClicked(file.id)">
-                    <i class="far fa-lg" :class="getFileIcon(file.type)"></i>
+                    <i class="far fa-lg fileIcon" :class="getFileIcon(file.type)"></i>
                     <span>[[ file.name ]]</span>
                 </div>
             </div>
         </div>
 
-        <div id="globalModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="globalModal" aria-hidden="true">
+        <div id="fileDetailsModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="fileDetailsModal" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title"></h5>
+                        <h5 class="modal-title">[[ fileName ]]</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body"></div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <div class="modal-body row">
+                        <div id="fileContent" class="col-12 order-2 col-md-9 order-md-1"></div>
+                        <div id="fileDetails" class="col-12 order-1 col-md-3 order-md-2">
+                            <div class="row">
+                                <div class="col-4 col-md-12">
+                                    <a v-bind:href="link" target="_blank">
+                                        <button type="button" class="btn btn-primary">
+                                            <i class="fas fa-download"></i>
+                                            <span class="d-none d-sm-inline-block">Download</span>
+                                        </button>
+                                    </a>
+                                </div>
+                                <div class="col-4 col-md-12">
+                                    <button type="button" class="btn btn-outline-primary" id="renameFileBtn">
+                                        <i class="fas fa-pencil-alt"></i>
+                                        <span class="d-none d-sm-inline-block">Rename</span>
+                                    </button>
+                                </div>
+                                <div class="col-4 col-md-12">
+                                    <button type="button" class="btn btn-outline-danger" id="deleteFileBtn">
+                                        <i class="fas fa-trash"></i>
+                                        <span class="d-none d-sm-inline-block">Delete</span>
+                                    </button>
+                                </div>
+                                <div class="col-4 col-md-12">Size: [[ size | prettyBytes ]]</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -70,21 +70,25 @@ function fileClicked(fileId) {
         return f.id == fileId;
     })
     var link = '/api/file/download?did=' + file.directory_id + '&fid=' + fileId;
-    if (/image\/|mp4|audio\//.test(file.type)) {
-        if (/image/.test(file.type)) {
-            var el = new Image();
-            el.src = link;
-        } else if (/mp4/.test(file.type)) {
-            var el = newPLayer('video', link, file.type);
-        } else if (/audio/.test(file.type)) {
-            var el = newPLayer('audio', link, file.type);
-        }
-        $("#globalModal .modal-title").text(file.name)
-        $('#globalModal .modal-body').html(el);
-        $("#globalModal").modal('show')
-    } else {
-        window.open(link, '_blank');
+    var el = document.createElement("i");
+    el.className = "fas " + getFileIcon(file.type);
+    if (/image/.test(file.type)) {
+        el = new Image();
+        el.src = link;
+    } else if (/mp4/.test(file.type)) {
+        el = newPLayer('video', link, file.type);
+    } else if (/audio/.test(file.type)) {
+        el = newPLayer('audio', link, file.type);
+    } else if (/pdf/.test(file.type)) {
+        el = document.createElement("iframe");
+        el.src = link;
     }
+    fileView.fileId = file.id;
+    fileView.fileName = file.name;
+    fileView.link = link;
+    fileView.size = file.size;
+    $('#fileDetailsModal .modal-body #fileContent').html(el);
+    $("#fileDetailsModal").modal('show')
 }
 
 function newPLayer(playerType, src, mime) {
@@ -134,8 +138,19 @@ var dataCounter = new Vue({
     }
 });
 
-$('#globalModal').on('hidden.bs.modal', function (e) {
-    $('#globalModal .modal-body').html('');
+var fileView = new Vue({
+    el: '#fileDetailsModal',
+    delimiters: ['[[', ']]'],
+    data: {
+        fileId: null,
+        fileName: "",
+        size: 0,
+        link: ''
+    }
+});
+
+$('#fileDetailsModal').on('hidden.bs.modal', function (e) {
+    $('#fileDetailsModal .modal-body #fileContent').html('');
 });
 
 $('#uploadModal').on('hidden.bs.modal', function (e) {
@@ -233,9 +248,39 @@ $('#newDirBtn').on('click', async function () {
         await $.post('/api/file/add_dir', JSON.stringify({
             name: $('#newDirName').val(),
             dirId: currentDirId
-        }))
+        }));
         $('#newDirModal').modal('hide');
-        fileManager.openDir(currentDirId)
+        fileManager.openDir(currentDirId);
+        dataCounter.loadDataCounter();
+    } catch (err) {
+        alert(err.responseJSON.message);
+    }
+});
+
+$('#deleteFileBtn').on('click', async function () {
+    if (!fileView.fileId || !confirm('Are you sure to delete file ?')) return;
+    try {
+        await $.post('/api/file/remove_file', JSON.stringify({
+            fileId: fileView.fileId
+        }));
+        $('#fileDetailsModal').modal('hide');
+        fileManager.openDir(currentDirId);
+        dataCounter.loadDataCounter();
+    } catch (err) {
+        alert(err.responseJSON.message);
+    }
+});
+
+$('#renameFileBtn').on('click', async function () {
+    var newName = prompt('Enter new file name');
+    if (!fileView.fileId || !newName) return;
+    try {
+        await $.post('/api/file/rename_file', JSON.stringify({
+            fileId: fileView.fileId,
+            name: newName
+        }));
+        $('#fileDetailsModal').modal('hide');
+        fileManager.openDir(currentDirId);
         dataCounter.loadDataCounter();
     } catch (err) {
         alert(err.responseJSON.message);

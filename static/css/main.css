@@ -4,7 +4,7 @@
 #filesContainer {
     padding: 10px;
     border: 2px solid #e3e3e3;
-    height: calc(100vh - 140px);
+    height: calc(100vh - 165px);
     min-height: 300px;
     overflow: auto;
 }
@@ -18,14 +18,54 @@
     color: white;
     background: #45709f;
 }
+.fileIcon{
+    width: 25px !important;
+    margin-right: 20px;
+}
 #path {
     padding: 8px 20px;
     background: #e3e3e3;
     margin: 10px 0 10px 0;
     border-radius: 10px;
 }
-audio, video, .modal-body img {
+#fileDetailsModal, #fileDetailsModal .modal-dialog {
+    min-width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0!important;
+}
+#fileDetailsModal .modal-content {
+    height: 100%;
+}
+#fileDetailsModal .modal-body {
+    height: calc(100% - 135px);
+}
+#fileDetails {
+    height: 80px;
+    text-align: center;
+    line-height: 40px;
+}
+#fileContent {
+    height: calc(100% - 90px);
+    margin-top: 10px;
+}
+@media (min-width: 768px) {
+    #fileContent, #fileDetails {
+        height: 100%;
+
+    }
+    #fileContent {
+        border-right: 1px solid #c2bdbd;
+        margin-top: 0;
+    }
+}
+#fileDetails button {
+    width: 80%;
+}
+#fileContent > * {
     width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 #dropbox {
     width: 94%;

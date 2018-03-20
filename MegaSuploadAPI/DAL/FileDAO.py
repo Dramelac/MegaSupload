@@ -68,7 +68,7 @@ def isFileExist(fileName, directoryId, user):
 
 
 def rename(file, newname, user):
-    if not isFileExist(newname, file.directory, user):
+    if isFileExist(newname, file.directory, user):
         raise FileExistsError
     perm = PermissionDAO.getPermission(file, user)
     if perm.owner or perm.edit:
