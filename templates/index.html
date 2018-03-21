@@ -31,9 +31,10 @@
                     <div class="sk-circle11 sk-child"></div>
                     <div class="sk-circle12 sk-child"></div>
                 </div>
-                <div v-for="dir in directories" v-cloak class="directory" v-show="!loader" v-on:click="openDir(dir.id, dir.name)">
-                    <i class="fas fa-lg fa-folder fileIcon"></i>
+                <div v-for="dir in directories" v-cloak class="directory" v-show="!loader" v-on:click="openDir(dir.id, dir.name)" v-on:mouseover="mouseOver" v-on:mouseleave="mouseLeave">
+                    <i class="fas fa-lg fa-folder"></i>
                     <span>[[ dir.name ]]</span>
+                    <button v-show="isOk" class="button">...</button>
                 </div>
                 <div v-for="file in files" v-cloak class="file" v-show="!loader" v-on:click="fileClicked(file.id)">
                     <i class="far fa-lg fileIcon" :class="getFileIcon(file.type)"></i>

@@ -90,7 +90,12 @@ function fileClicked(fileId) {
     $('#fileDetailsModal .modal-body #fileContent').html(el);
     $("#fileDetailsModal").modal('show')
 }
-
+function mouseOver(){
+    this.isOk = true
+}
+function mouseLeave(){
+    this.isOk = false
+}
 function newPLayer(playerType, src, mime) {
     var el = document.createElement(playerType);
     el.setAttribute('controls', true);
@@ -109,13 +114,16 @@ var fileManager = new Vue({
         directories: [],
         files: [],
         loader: true,
-        paths: []
+        paths: [],
+        isOk : false
     },
     mounted: loadDir,
     methods: {
         fileClicked: fileClicked,
         openDir: loadDir,
-        getFileIcon: getFileIcon
+        getFileIcon: getFileIcon,
+        mouseOver : mouseOver,
+        mouseLeave : mouseLeave
     }
 });
 
