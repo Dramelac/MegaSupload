@@ -24,6 +24,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='user',
             name='max_data_allowed',
-            field=models.BigIntegerField(default=31457280),
+            field=models.BigIntegerField(default=32212254720),
         ),
     ]
