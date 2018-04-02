@@ -8,8 +8,10 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, PermissionDAO, FileKeyDAO
+from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, PermissionDAO, FileKeyDAO, UserDAO
 from MegaSuploadAPI.forms import *
+from MegaSuploadAPI.models import File
+from MegaSuploadAPI.tools.tools import is_uuid
 
 
 @login_required
@@ -55,11 +57,9 @@ def checkReplacement(request):
 
 @login_required
 def download(request):
-    dirId = request.GET.get("did")
     fileId = request.GET.get("fid")
     key = request.GET.get("k")
     try:
-        directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
         file = FileDAO.getFileFromId(fileId, request.user)
     except (ObjectDoesNotExist, PermissionDenied):
         return JsonResponse({"message": "Not found"}, status=404)
@@ -67,9 +67,10 @@ def download(request):
         return JsonResponse({"message": "Bad input"}, status=400)
 
     try:
-        file_data = FileSystemDAO.get_file(directory, file.id, key)
+        file_data = FileSystemDAO.get_file(file.directory, file.id, key)
         response = HttpResponse(file_data, content_type=file.type)
-        response['Content-Disposition'] = 'inline; filename*=UTF-8\'\'%s' % urllib.parse.quote(file.name.encode('utf-8'))
+        response['Content-Disposition'] = 'inline; filename*=UTF-8\'\'%s' % urllib.parse.quote(
+            file.name.encode('utf-8'))
         return response
     except ObjectDoesNotExist:
         return JsonResponse({"message": "Not found"}, status=404)
@@ -80,12 +81,10 @@ def download(request):
 def test(request):
     # test API method
     # put your code here ok
-    user = request.user
-    directory = DirectoryDAO.getDirectoryFromId('93457884-7959-4aea-a833-88a7a6052ba2', user=user)
-    DirectoryDAO.removeDirectory(directory, user)
+    # user = request.user
     # fileKey = FileKeyDAO.getFileKey(user, file)
-
-    return JsonResponse({"message": "Executed"}, status=200)
+    # return JsonResponse({"message": "Executed"}, status=200)
+    return share(request)
 
 
 @login_required
@@ -237,7 +236,7 @@ def getFileKey(request):
         fk = FileKeyDAO.getFileKey(user, fileId)
         return JsonResponse({"key": fk.key}, status=200)
     except ObjectDoesNotExist:
-        return JsonResponse({"message": "Not found"}, status=404)\
+        return JsonResponse({"message": "Not found"}, status=404)
 
 
 @login_required
@@ -253,3 +252,47 @@ def removeFile(request):
         return JsonResponse({"message": 'File removed'}, status=200)
     except (ObjectDoesNotExist, PermissionDenied):
         return JsonResponse({"message": "Not found"}, status=404)
+
+
+@login_required
+@require_http_methods(["POST"])
+def share(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except JSONDecodeError:
+        return JsonResponse({"message": "Bad JSON."}, status=400)
+    elementId = data.get('elementId', '').strip()
+    targetUserId = data.get('targetUserId', '').strip()
+    key = data.get('encryptedKey', '').strip()  # Need only for file sharing| /!\ directory sharing don't handle FileKey
+    read = data.get('read', 0)
+    write = data.get('write', 0)
+    share = data.get('share', 0)
+    user = request.user
+
+    # Input Check
+    if is_uuid(elementId) and is_uuid(targetUserId):
+        try:
+            element = DirectoryDAO.getDirectoryFromId(elementId, user)
+        except ObjectDoesNotExist:
+            try:
+                element = FileDAO.getFileFromId(elementId, user)
+            except ObjectDoesNotExist:
+                return JsonResponse({"message": "Not found"}, status=404)
+        try:
+            targetUser = UserDAO.getUserFromId(targetUserId)
+        except ObjectDoesNotExist:
+            return JsonResponse({"message": "Not found"}, status=404)
+
+        if type(element) is File and key == "":
+            return JsonResponse({"message": "Bad inputs"}, status=400)
+
+        try:
+            PermissionDAO.share(user, targetUser, element, read, write, share)
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=400)
+        if type(element) is File:
+            FileKeyDAO.insertFileKey(targetUser, element, key)
+        return JsonResponse({"message": "Success"}, status=200)
+
+    else:
+        return JsonResponse({"message": "Bad inputs."}, status=400)

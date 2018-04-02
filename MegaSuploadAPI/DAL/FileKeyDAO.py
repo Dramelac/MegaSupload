@@ -34,3 +34,7 @@ def getFileKey(owner, file):
         return fileKey
     else:
         raise ObjectDoesNotExist
+
+
+def insertFileKey(owner, file, key):
+    FileKey.objects.create(owner=owner, file=file, key=key)
