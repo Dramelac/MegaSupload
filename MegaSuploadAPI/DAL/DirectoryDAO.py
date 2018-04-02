@@ -99,6 +99,8 @@ def removeDirectory(directory, user):
         fileList = FileDAO.listFiles(directory, user)
         for file in fileList:
             FileDAO.remove(file['id'], user)
-        # dirList = Directory.objects.filter(parent=directory)
+        dirList = Directory.objects.filter(parent=directory)
+        for current_dir in dirList:
+            removeDirectory(current_dir, user)
         directory.delete()  # Cascade delete ?
         # FK problem ? to test
