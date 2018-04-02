@@ -91,3 +91,24 @@ def getOwner(element):
     if type(element) == File:
         return Permission.objects.get(owner=True, file=element)
     return Permission.objects.get(owner=True, directory=element)
+
+
+def getSharedDirectory(user):
+    dir_list = []
+    perm_list = Permission.objects.filter(user=user, owner=False, file=None)
+    for perm in perm_list:
+        dir_list.append({'name': perm.directory.name, 'id': perm.directory.id})
+    return dir_list
+
+
+def getSharedFile(user):
+    file_list = []
+    perm_list = Permission.objects.filter(user=user, owner=False, directory=None)
+    for perm in perm_list:
+        file_list.append({
+            'id': perm.file.id,
+            'name': perm.file.name,
+            'type': perm.file.type,
+            'size': perm.file.size,
+            'directory_id': perm.file.directory.id})
+    return file_list

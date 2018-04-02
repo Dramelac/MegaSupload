@@ -297,3 +297,11 @@ def share(request):
 
     else:
         return JsonResponse({"message": "Bad inputs."}, status=400)
+
+
+@login_required
+def ls_shared(request):
+    user = request.user
+    dir_list = PermissionDAO.getSharedDirectory(user)
+    file_list = PermissionDAO.getSharedFile(user)
+    return JsonResponse({"directory": dir_list, "file": file_list}, status=200)
