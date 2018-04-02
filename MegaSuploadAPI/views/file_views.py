@@ -239,6 +239,7 @@ def getFileKey(request):
     except ObjectDoesNotExist:
         return JsonResponse({"message": "Not found"}, status=404)\
 
+
 @login_required
 @require_http_methods(["POST"])
 def removeFile(request):

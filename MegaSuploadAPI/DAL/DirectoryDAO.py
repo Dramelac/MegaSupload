@@ -4,8 +4,6 @@ from MegaSuploadAPI.DAL import PermissionDAO, FileDAO
 from MegaSuploadAPI.models import Directory
 
 
-# TODO Remove Directory (+ File + Permission linked)
-
 def addDirectory(user, name, parent=None):
     directory = Directory.objects.create(name=name, parent=parent)
     if parent:
@@ -93,11 +91,11 @@ def moveDirectory(directory, newParent, user):
         raise PermissionDenied
 
 
+# TODO To test
 # Only for owner (for now)
 def removeDirectory(directory, user):
     perm = PermissionDAO.getPermission(directory, user)
     if perm.owner and directory.parent is not None:
-        # TODO Add file removed
         fileList = FileDAO.listFiles(directory, user)
         for file in fileList:
             FileDAO.remove(file['id'], user)

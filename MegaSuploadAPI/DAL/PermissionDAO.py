@@ -85,3 +85,9 @@ def getPermission(element, user):
     if type(element) == File:
         return Permission.objects.get(user=user, file=element)
     return Permission.objects.get(user=user, directory=element)
+
+
+def getOwner(element):
+    if type(element) == File:
+        return Permission.objects.get(owner=True, file=element)
+    return Permission.objects.get(owner=True, directory=element)

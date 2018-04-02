@@ -1,5 +1,3 @@
-# TODO Remove File (+ FileKey / Permission linked)
-
 # /!\ This DAO DON'T interact with FileSystem !!! (only file indexing) Use FileSystemDAO for file storage !
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
@@ -8,36 +6,39 @@ from MegaSuploadAPI.models import File
 
 
 def _newFile(file, directory, user):
-    if user.data_used + file.size > user.max_data_allowed:
+    owner = PermissionDAO.getOwner(directory).user
+
+    if owner.data_used + file.size > owner.max_data_allowed:
         raise PermissionError
     build_file = File.objects.create(directory=directory, name=file.name, type=file.content_type, size=file.size)
     PermissionDAO.inheritPermission(directory, user, build_file)
 
     key = FileKeyDAO.newFileKey(owner=user, file=build_file)
+    # TODO async thread (storage)
     FileSystemDAO.store_file(directory, file, build_file.id, key)
 
-    # TODO check data relative to owner
-    user.data_used += file.size
-    user.save()
+    owner.data_used += file.size
+    owner.save()
 
 
 def _updateFile(file, file_fs, directory, user, key):
+    owner = PermissionDAO.getOwner(file_fs).user
     oldSize = file_fs.size
-    if user.data_used - oldSize + file.size > user.max_data_allowed:
+    if owner.data_used - oldSize + file.size > owner.max_data_allowed:
         raise PermissionError
     perm = PermissionDAO.getPermission(file_fs, user)
     dirPerm = PermissionDAO.getPermission(directory, user)
 
     if (perm is not None and (perm.owner or perm.edit)) or \
             (dirPerm is not None and (dirPerm.owner or dirPerm.edit)):
+        # TODO async thread (storage)
         FileSystemDAO.store_file(directory, file, file_fs.id, key)
     else:
         raise PermissionDenied
 
-    # TODO check data relative to owner
-    user.data_used -= oldSize
-    user.data_used += file.size
-    user.save()
+    owner.data_used -= oldSize
+    owner.data_used += file.size
+    owner.save()
 
     file_fs.size = file.size
     file_fs.save()
@@ -113,6 +114,7 @@ def listFiles(directory, user):
     return list(result)
 
 
+# TODO To test
 def remove(fileId, user):
     file = getFileFromId(fileId, user)
     perm = PermissionDAO.getPermission(file, user)
