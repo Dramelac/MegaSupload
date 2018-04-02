@@ -121,6 +121,10 @@ def remove(fileId, user):
     if perm is not None and perm.owner:
         PermissionDAO.remove(user, user, file)
         dataSize = file.size
+
+        # TODO async fs operation
+        FileSystemDAO.remove_file(file.directory, file.id)
+
         file.delete()
         user.data_used -= dataSize
         if user.data_used < 0:
