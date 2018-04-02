@@ -114,7 +114,6 @@ def listFiles(directory, user):
     return list(result)
 
 
-# TODO To test
 def remove(fileId, user):
     file = getFileFromId(fileId, user)
     perm = PermissionDAO.getPermission(file, user)

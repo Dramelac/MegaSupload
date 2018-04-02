@@ -91,7 +91,6 @@ def moveDirectory(directory, newParent, user):
         raise PermissionDenied
 
 
-# TODO To test
 # Only for owner (for now)
 def removeDirectory(directory, user):
     perm = PermissionDAO.getPermission(directory, user)

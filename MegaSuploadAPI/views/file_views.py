@@ -287,6 +287,7 @@ def share(request):
             return JsonResponse({"message": "Bad inputs"}, status=400)
 
         try:
+            # TODO check is perm exist => then update
             PermissionDAO.share(user, targetUser, element, read, write, share)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=400)
