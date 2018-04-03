@@ -1,6 +1,5 @@
 import json
 import urllib
-from json import JSONDecodeError
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, FieldError
@@ -12,6 +11,7 @@ from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, PermissionD
 from MegaSuploadAPI.forms import *
 from MegaSuploadAPI.models import File
 from MegaSuploadAPI.tools.tools import is_uuid
+from MegaSuploadAPI.decorators import json_parser
 
 
 @login_required
@@ -42,13 +42,10 @@ def upload(request):
 
 @login_required
 @require_http_methods(["POST"])
+@json_parser
 def checkReplacement(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except JSONDecodeError:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-    dirId = data.get('dirId', '').strip()
-    fileName = data.get('fname', '').strip()
+    dirId = request.json.get('dirId', '').strip()
+    fileName = request.json.get('fname', '').strip()
     return JsonResponse({
         "isFileExist": FileDAO.isFileExist(fileName, dirId, request.user),
         "fileId": FileDAO.getFileIdFromName(fileName, dirId, request.user)
@@ -106,13 +103,10 @@ def ls(request):
 
 
 @login_required
+@json_parser
 def addDirectory(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except JSONDecodeError:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-    dirId = data.get('dirId', '').strip()
-    name = data.get('name', '').strip()
+    dirId = request.json.get('dirId', '').strip()
+    name = request.json.get('name', '').strip()
     user = request.user
 
     try:
@@ -130,13 +124,10 @@ def addDirectory(request):
 
 
 @login_required
+@json_parser
 def renameDirectory(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except JSONDecodeError:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-    elementId = data.get('uuid', '').strip()
-    name = data.get('name', '').strip()
+    elementId = request.json.get('uuid', '').strip()
+    name = request.json.get('name', '').strip()
     if not elementId or not name:
         return JsonResponse({"message": "Bad input"}, status=400)
     user = request.user
@@ -153,13 +144,10 @@ def renameDirectory(request):
 
 
 @login_required
+@json_parser
 def renameFile(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except JSONDecodeError:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-    fileId = data.get('fileId', '').strip()
-    name = data.get('name', '').strip()
+    fileId = request.json.get('fileId', '').strip()
+    name = request.json.get('name', '').strip()
     if not fileId or not name:
         return JsonResponse({"message": "Bad input"}, status=400)
 
@@ -177,13 +165,10 @@ def renameFile(request):
 
 
 @login_required
+@json_parser
 def moveDir(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except JSONDecodeError:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-    dirId = data.get('dirId', '').strip()
-    targetDirId = data.get('targetDirId', '').strip()
+    dirId = request.json.get('dirId', '').strip()
+    targetDirId = request.json.get('targetDirId', '').strip()
     if not dirId or not targetDirId or dirId == targetDirId:
         return JsonResponse({"message": "Bad input"}, status=400)
 
@@ -202,13 +187,10 @@ def moveDir(request):
 
 
 @login_required
+@json_parser
 def moveFile(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except JSONDecodeError:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-    fileId = data.get('fileId', '').strip()
-    dirId = data.get('dirId', '').strip()
+    fileId = request.json.get('fileId', '').strip()
+    dirId = request.json.get('dirId', '').strip()
     user = request.user
 
     try:
@@ -225,12 +207,9 @@ def moveFile(request):
 
 @login_required
 @require_http_methods(["POST"])
+@json_parser
 def getFileKey(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except JSONDecodeError:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-    fileId = data.get('fileId', '').strip()
+    fileId = request.json.get('fileId', '').strip()
     user = request.user
     try:
         fk = FileKeyDAO.getFileKey(user, fileId)
@@ -241,12 +220,9 @@ def getFileKey(request):
 
 @login_required
 @require_http_methods(["POST"])
+@json_parser
 def removeFile(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except JSONDecodeError:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-    fileId = data.get('fileId', '').strip()
+    fileId = request.json.get('fileId', '').strip()
     try:
         FileDAO.remove(fileId, request.user)
         return JsonResponse({"message": 'File removed'}, status=200)
@@ -256,17 +232,14 @@ def removeFile(request):
 
 @login_required
 @require_http_methods(["POST"])
+@json_parser
 def share(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except JSONDecodeError:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-    elementId = data.get('elementId', '').strip()
-    targetUserId = data.get('targetUserId', '').strip()
-    key = data.get('encryptedKey', '').strip()  # Need only for file sharing| /!\ directory sharing don't handle FileKey
-    read = data.get('read', 0)
-    write = data.get('write', 0)
-    share = data.get('share', 0)
+    elementId = request.json.get('elementId', '').strip()
+    targetUserId = request.json.get('targetUserId', '').strip()
+    key = request.json.get('encryptedKey', '').strip()  # Need only for file sharing| /!\ directory sharing don't handle FileKey
+    read = request.json.get('read', 0)
+    write = request.json.get('write', 0)
+    share = request.json.get('share', 0)
     user = request.user
 
     # Input Check

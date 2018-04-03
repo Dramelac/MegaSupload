@@ -1,6 +1,5 @@
 import json
 import re
-from json import JSONDecodeError
 
 from Crypto.PublicKey import RSA
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
@@ -9,21 +8,19 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
 
 from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO
+from MegaSuploadAPI.decorators import json_parser
 from MegaSuploadAPI.models import *
 
 
 @require_http_methods(["POST"])
+@json_parser
 def register(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except JSONDecodeError:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-    username = data.get('username', '').strip()
-    first_name = data.get('first_name', '').strip()
-    last_name = data.get('last_name', '').strip()
-    email = data.get('email', '').strip()
-    psw1 = data.get('psw1', '')
-    psw2 = data.get('psw2', '')
+    username = request.json.get('username', '').strip()
+    first_name = request.json.get('first_name', '').strip()
+    last_name = request.json.get('last_name', '').strip()
+    email = request.json.get('email', '').strip()
+    psw1 = request.json.get('psw1', '')
+    psw2 = request.json.get('psw2', '')
     if not username or not email or not psw1 or not psw2:
         return JsonResponse({"message": "Please fill all fields."}, status=400)
     if psw1 != psw2:
@@ -53,15 +50,10 @@ def register(request):
 
 
 @require_http_methods(["POST"])
+@json_parser
 def login(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except JSONDecodeError:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-
-    username = data.get('username', '').strip()
-    password = data.get('password', '')
-
+    username = request.json.get('username', '').strip()
+    password = request.json.get('password', '')
     auth = authenticate(username=username, password=password)
     if auth is not None:
         user = User.objects.get(id=auth.id)
@@ -88,18 +80,14 @@ def logout(request):
 
 @login_required
 @require_http_methods(["POST"])
+@json_parser
 def update_profile(request):
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except JSONDecodeError:
-        return JsonResponse({"message": "Bad JSON."}, status=400)
-
-    first_name = data.get('first_name', '').strip()
-    last_name = data.get('last_name', '').strip()
-    email = data.get('email', '').strip()
-    pwd = data.get('pwd', '')
-    psw1 = data.get('psw1', '')
-    psw2 = data.get('psw2', '')
+    first_name = request.json.get('first_name', '').strip()
+    last_name = request.json.get('last_name', '').strip()
+    email = request.json.get('email', '').strip()
+    pwd = request.json.get('pwd', '')
+    psw1 = request.json.get('psw1', '')
+    psw2 = request.json.get('psw2', '')
 
     if not email:
         return JsonResponse({"message": "Please fill all fields."}, status=400)
