@@ -1,4 +1,3 @@
-import json
 import re
 
 from Crypto.PublicKey import RSA
@@ -8,8 +7,8 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
 
 from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO
-from MegaSuploadAPI.decorators import json_parser
 from MegaSuploadAPI.models import *
+from MegaSuploadAPI.tools.decorators import json_parser
 
 
 @require_http_methods(["POST"])
