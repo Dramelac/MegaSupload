@@ -1,4 +1,3 @@
-import json
 import urllib
 
 from django.contrib.auth.decorators import login_required
@@ -10,8 +9,8 @@ from django.views.decorators.http import require_http_methods
 from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, PermissionDAO, FileKeyDAO, UserDAO
 from MegaSuploadAPI.forms import *
 from MegaSuploadAPI.models import File
+from MegaSuploadAPI.tools.decorators import json_parser
 from MegaSuploadAPI.tools.tools import is_uuid
-from MegaSuploadAPI.decorators import json_parser
 
 
 @login_required

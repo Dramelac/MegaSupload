@@ -1,5 +1,6 @@
 import json
 from json import JSONDecodeError
+
 from django.http import JsonResponse
 
 
