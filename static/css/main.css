@@ -22,6 +22,12 @@
     width: 25px !important;
     margin-right: 20px;
 }
+.btnSetting {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: ghostwhite;
+}
 #path {
     padding: 8px 20px;
     background: #e3e3e3;

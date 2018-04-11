@@ -107,6 +107,22 @@ function newPLayer(playerType, src, mime) {
     return el;
 }
 
+function closeMenu() {
+            this.viewMenu = false;
+}
+
+function openMenu(e) {
+            this.viewMenu = true;
+
+            Vue.nextTick(function() {
+                this.$$.right.focus();
+                console.log(e.y+"e x = "+e.x);
+                this.top = e.y;
+                this.left = e.x;
+            }.bind(this));
+            e.preventDefault();
+}
+
 var fileManager = new Vue({
     el: '#fileApp',
     delimiters: ['[[', ']]'],
@@ -115,7 +131,10 @@ var fileManager = new Vue({
         files: [],
         loader: true,
         paths: [],
-        isOk : false
+        isOk : false,
+        viewMenu: false,
+        top: '0px',
+        left: '0px'
     },
     mounted: loadDir,
     methods: {
@@ -123,7 +142,9 @@ var fileManager = new Vue({
         openDir: loadDir,
         getFileIcon: getFileIcon,
         mouseOver : mouseOver,
-        mouseLeave : mouseLeave
+        mouseLeave : mouseLeave,
+        openMenu: openMenu,
+        closeMenu: closeMenu,
     }
 });
 
@@ -132,6 +153,7 @@ async function loadDataCounter() {
     this.dataUsed = req.dataUsed;
     this.maxDataAllowed = req.maxDataAllowed;
 }
+
 
 var dataCounter = new Vue({
     el: '#dataUsed',
