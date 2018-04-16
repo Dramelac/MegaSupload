@@ -25,7 +25,7 @@ SECRET_KEY = '+ffurn5+!ay_)ng8w5t21!z^)s(o!vd@pnpn*ngz=v+%5dcfai'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['megasupload.lsd-music.fr', 'localhost']
 
 
 # Application definition
@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'MegaSuploadApp.apps.MegasuploadappConfig',
-    'MegaSuploadAPI.apps.MegasuploadapiConfig'
+    'MegaSuploadAPI.apps.MegasuploadapiConfig',
+    'social_django'
 ]
 
 MIDDLEWARE = [
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware'
 ]
 
 ROOT_URLCONF = 'MegaSupload.urls'
@@ -65,6 +67,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -129,4 +133,31 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.open_id.OpenIdAuth',  # for Google authentication
+    'social_core.backends.google.GoogleOpenId',  # for Google authentication
+    'social_core.backends.google.GoogleOAuth2',  # for Google authentication
+    'django.contrib.auth.backends.ModelBackend'
+)
+
 AUTH_USER_MODEL = 'MegaSuploadAPI.User'
+
+LOGIN_URL = "/app/login/"
+LOGOUT_URL = "/api/auth/logout"
+LOGIN_REDIRECT_URL = '/app/'
+
+#Social auth FB
+SOCIAL_AUTH_FACEBOOK_KEY = '186888078747587'
+SOCIAL_AUTH_FACEBOOK_SECRET = '2743735e32a32525732a05274660801d'
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+    'fields': 'id,name,email',
+}
+#Social auth Google
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '481016636670-mumclrmgs44d3ksfa8jnh0u6rj01ut96.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'VGm5j3XXoVOPAz_pGAwNIGoZ'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email']
+# Todo : Switch to true on server
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
+SOCIAL_AUTH_CLEAN_USERNAMES = False

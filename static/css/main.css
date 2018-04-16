@@ -112,4 +112,24 @@ progress::-webkit-progress-value {
     background: #567ba5;
     border-radius: 5px;
 }
+.btn_connect {
+    display: inline-block;
+    line-height: 50px;
+    border-radius: 4px;
+    font-size: 16px;
+    color: white!important;
+    margin-bottom: 30px;
+}
+.btn_connect img {
+    height: 25px;
+    padding-right: 18px;
+}
+
+.btn_fb {
+    background: #3b5998;
+}
+.btn_google {
+    background: #d54a33;
+}
+
 
