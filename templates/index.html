@@ -68,7 +68,7 @@
                         <div id="fileContent" class="col-12 order-2 col-md-9 order-md-1"></div>
                         <div id="fileDetails" class="col-12 order-1 col-md-3 order-md-2">
                             <div class="row">
-                                <div class="col-4 col-md-12">
+                                <div class="col-3 col-md-12">
                                     <a v-bind:href="link" target="_blank">
                                         <button type="button" class="btn btn-primary">
                                             <i class="fas fa-download"></i>
@@ -76,13 +76,19 @@
                                         </button>
                                     </a>
                                 </div>
-                                <div class="col-4 col-md-12">
+                                <div class="col-3 col-md-12">
                                     <button type="button" class="btn btn-outline-primary" id="renameFileBtn">
                                         <i class="fas fa-pencil-alt"></i>
                                         <span class="d-none d-sm-inline-block">Rename</span>
                                     </button>
                                 </div>
-                                <div class="col-4 col-md-12">
+                                <div class="col-3 col-md-12">
+                                    <button type="button" class="btn btn-outline-primary" id="shareFileBtn">
+                                        <i class="fas fa-share-alt"></i>
+                                        <span class="d-none d-sm-inline-block">Share</span>
+                                    </button>
+                                </div>
+                                <div class="col-3 col-md-12">
                                     <button type="button" class="btn btn-outline-danger" id="deleteFileBtn">
                                         <i class="fas fa-trash"></i>
                                         <span class="d-none d-sm-inline-block">Delete</span>

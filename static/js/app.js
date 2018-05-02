@@ -296,3 +296,18 @@ $('#renameFileBtn').on('click', async function () {
         alert(err.responseJSON.message);
     }
 });
+
+$('#shareFileBtn').on('click', async function () {
+    if (!fileView.fileId || !newName) return;
+    try {
+        await $.post('/api/file/rename_file', JSON.stringify({
+            fileId: fileView.fileId,
+            name: newName
+        }));
+        $('#fileDetailsModal').modal('hide');
+        fileManager.openDir(currentDirId);
+        dataCounter.loadDataCounter();
+    } catch (err) {
+        alert(err.responseJSON.message);
+    }
+});

@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 
 from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO
 from MegaSuploadAPI.models import *
@@ -124,4 +125,15 @@ def get_ratio(request):
     return JsonResponse({
         'dataUsed': request.user.data_used,
         'maxDataAllowed': request.user.max_data_allowed
+    }, status=200)
+
+@login_required
+@require_http_methods(["GET"])
+def search(request):
+    query = request.GET.get('query', '')
+    if not query:
+        return JsonResponse({"message": "Bad inputs."}, status=400)
+    results = User.objects.annotate(rank=SearchRank(SearchVector('username'), SearchQuery(query))).filter(rank__gt=0).order_by('-rank').values('id', 'username')[:5]
+    return JsonResponse({
+        'results': list(results)
     }, status=200)

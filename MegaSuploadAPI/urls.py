@@ -9,6 +9,7 @@ urlpatterns = [
     path('oauth/', include('social_django.urls', namespace='social')),
     path('user/update_profile', users_views.update_profile),
     path('user/ratio', users_views.get_ratio),
+    path('user/search', users_views.search),
     path('file/upload', file_views.upload, name="upload"),
     path('file/download', file_views.download),
     path('file/list_item', file_views.ls),
