@@ -36,7 +36,8 @@ function getFileIcon(mimeType) {
     return 'fa-file';
 }
 
-async function loadDir(dirId, dirName) {
+async function loadDir(dirId, dirName, event) {
+    if (typeof event !== 'undefined' && (event.target.tagName === 'BUTTON' || event.target.tagName === 'A')) return;
     this.loader = true;
     this.files = [];
     this.directories = [];
@@ -44,12 +45,11 @@ async function loadDir(dirId, dirName) {
     this.files = data.file;
     this.directories = data.directory.filter(function (d) {
         return d.name !== ".";
+    }).map(function (d) {
+        d.menuShown = false;
+        return d;
     }).sort(function (a, b) {
         return a - b;
-    });
-    this.directories.map(function (d) {
-        d.menuShown=null;
-        return d;
     });
     this.loader = false;
     currentDirId = data.directory.find(function (d) {
@@ -94,18 +94,7 @@ function fileClicked(fileId) {
     $('#fileDetailsModal .modal-body #fileContent').html(el);
     $("#fileDetailsModal").modal('show')
 }
-function mouseOver(dir){
-    dir.menuShown = true;
-    dir.name = dir.name + " ";
-    console.log(dir.name + " over  "+ dir.menuShown);
-    return dir.menuShown;
-}
-function mouseLeave(dir){
-    dir.menuShown = false;
-    dir.name = dir.name.trim(" ");
-    console.log(dir.name + " leave "+ dir.menuShown);
-    return dir.menuShown;
-}
+
 function newPLayer(playerType, src, mime) {
     var el = document.createElement(playerType);
     el.setAttribute('controls', true);
@@ -117,21 +106,6 @@ function newPLayer(playerType, src, mime) {
     return el;
 }
 
-function closeMenu() {
-            this.viewMenu = false;
-}
-
-function openMenu(e) {
-            this.viewMenu = true;
-
-            Vue.nextTick(function() {
-                this.$$.right.focus();
-                console.log(e.y+"e x = "+e.x);
-                this.top = e.y;
-                this.left = e.x;
-            }.bind(this));
-            e.preventDefault();
-}
 
 var fileManager = new Vue({
     el: '#fileApp',
@@ -150,11 +124,7 @@ var fileManager = new Vue({
     methods: {
         fileClicked: fileClicked,
         openDir: loadDir,
-        getFileIcon: getFileIcon,
-        mouseOver : mouseOver,
-        mouseLeave : mouseLeave,
-        openMenu: openMenu,
-        closeMenu: closeMenu
+        getFileIcon: getFileIcon
     }
 });
 

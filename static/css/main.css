@@ -11,7 +11,7 @@
 .file, .directory {
     padding: 15px 25px;
     cursor: pointer;
-    transition: all .1s ease-in-out;
+    transition: all .1s ease-out;
     border-bottom: 1px solid #d7d7d7;
 }
 .file:hover, .directory:hover {
@@ -131,5 +131,11 @@ progress::-webkit-progress-value {
 .btn_google {
     background: #d54a33;
 }
-
-
+.dropdown {
+    float: right;
+}
+.dropdown .btn {
+    padding: 0px 8px;
+    font-size: 20px;
+    margin-top: -5px;
+}
