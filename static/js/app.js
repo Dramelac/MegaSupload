@@ -47,6 +47,10 @@ async function loadDir(dirId, dirName) {
     }).sort(function (a, b) {
         return a - b;
     });
+    this.directories.map(function (d) {
+        d.menuShown=null;
+        return d;
+    });
     this.loader = false;
     currentDirId = data.directory.find(function (d) {
         return d.type === "current";
@@ -90,11 +94,17 @@ function fileClicked(fileId) {
     $('#fileDetailsModal .modal-body #fileContent').html(el);
     $("#fileDetailsModal").modal('show')
 }
-function mouseOver(){
-    this.isOk = true
+function mouseOver(dir){
+    dir.menuShown = true;
+    dir.name = dir.name + " ";
+    console.log(dir.name + " over  "+ dir.menuShown);
+    return dir.menuShown;
 }
-function mouseLeave(){
-    this.isOk = false
+function mouseLeave(dir){
+    dir.menuShown = false;
+    dir.name = dir.name.trim(" ");
+    console.log(dir.name + " leave "+ dir.menuShown);
+    return dir.menuShown;
 }
 function newPLayer(playerType, src, mime) {
     var el = document.createElement(playerType);
@@ -144,7 +154,7 @@ var fileManager = new Vue({
         mouseOver : mouseOver,
         mouseLeave : mouseLeave,
         openMenu: openMenu,
-        closeMenu: closeMenu,
+        closeMenu: closeMenu
     }
 });
 

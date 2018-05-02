@@ -31,11 +31,11 @@
                     <div class="sk-circle11 sk-child"></div>
                     <div class="sk-circle12 sk-child"></div>
                 </div>
-                <div v-for="dir in directories" v-cloak class="directory" v-show="!loader" v-on:mouseover="mouseOver"
-                     v-on:mouseleave="mouseLeave">
+                <div v-for="dir in directories" v-cloak class="directory" v-show="!loader" v-on:mouseover="mouseOver(dir)"
+                     v-on:mouseleave="mouseLeave(dir)">
                     <i class="fas fa-lg fa-folder fileIcon"></i>
                     <span v-on:click="openDir(dir.id, dir.name)">[[ dir.name ]]</span>
-                    <div class="dropdown" v-if="isOk">
+                    <div class="dropdown" v-show="dir.menuShown">
                         <button class="btn btn-secondary" type="button" id="dropdownMenuButton"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                            ...
@@ -46,7 +46,6 @@
                             <a class="dropdown-item" href="#">Download</a>
                         </div>
                     </div>
-
                 </div>
                 <div v-for="file in files" v-cloak class="file" v-show="!loader" v-on:click="fileClicked(file.id)">
                     <i class="far fa-lg fileIcon" :class="getFileIcon(file.type)"></i>
