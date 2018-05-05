@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = '+ffurn5+!ay_)ng8w5t21!z^)s(o!vd@pnpn*ngz=v+%5dcfai'
 DEBUG = True
 
 ALLOWED_HOSTS = ['megasupload.lsd-music.fr', 'localhost']
-
 
 # Application definition
 
@@ -77,7 +75,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'MegaSupload.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
@@ -91,7 +88,6 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -111,7 +107,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
@@ -124,7 +119,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
@@ -148,14 +142,14 @@ LOGIN_URL = "/app/login/"
 LOGOUT_URL = "/api/auth/logout"
 LOGIN_REDIRECT_URL = '/app/'
 
-#Social auth FB
+# Social auth FB
 SOCIAL_AUTH_FACEBOOK_KEY = '186888078747587'
 SOCIAL_AUTH_FACEBOOK_SECRET = '2743735e32a32525732a05274660801d'
 SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
 SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
     'fields': 'id,name,email',
 }
-#Social auth Google
+# Social auth Google
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '481016636670-mumclrmgs44d3ksfa8jnh0u6rj01ut96.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'VGm5j3XXoVOPAz_pGAwNIGoZ'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email']
