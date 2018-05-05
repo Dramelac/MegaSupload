@@ -162,3 +162,5 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email']
 # Todo : Switch to true on server
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
 SOCIAL_AUTH_CLEAN_USERNAMES = False
+
+ROOT_PATH = "fs_storage"

@@ -235,10 +235,8 @@ def removeFile(request):
 def share(request):
     elementId = request.json.get('elementId', '').strip()
     targetUserId = request.json.get('targetUserId', '').strip()
-
     key = request.json.get('encryptedKey', '').strip()
-    # Need only for file sharing| /!\ directory sharing don't handle FileKey
-
+    #    Need only for file sharing| /!\ directory sharing don't handle FileKey
     read = request.json.get('read', 0)
     write = request.json.get('write', 0)
     share = request.json.get('share', 0)
