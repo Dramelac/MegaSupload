@@ -235,7 +235,10 @@ def removeFile(request):
 def share(request):
     elementId = request.json.get('elementId', '').strip()
     targetUserId = request.json.get('targetUserId', '').strip()
-    key = request.json.get('encryptedKey', '').strip()  # Need only for file sharing| /!\ directory sharing don't handle FileKey
+
+    key = request.json.get('encryptedKey', '').strip()
+    # Need only for file sharing| /!\ directory sharing don't handle FileKey
+
     read = request.json.get('read', 0)
     write = request.json.get('write', 0)
     share = request.json.get('share', 0)
@@ -258,13 +261,20 @@ def share(request):
         if type(element) is File and key == "":
             return JsonResponse({"message": "Bad inputs"}, status=400)
 
+        # Is permission already exist?
         try:
-            # TODO check is perm exist => then update
-            PermissionDAO.share(user, targetUser, element, read, write, share)
+            try:
+                existing = PermissionDAO.getPermission(element, targetUser)
+                if existing is not None:
+                    PermissionDAO.update(user, targetUser, element, read, write, share)
+                else:
+                    raise ObjectDoesNotExist
+            except ObjectDoesNotExist:
+                    PermissionDAO.share(user, targetUser, element, read, write, share)
+            if type(element) is File:
+                FileKeyDAO.insertFileKey(targetUser, element, key)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=400)
-        if type(element) is File:
-            FileKeyDAO.insertFileKey(targetUser, element, key)
         return JsonResponse({"message": "Success"}, status=200)
 
     else:
