@@ -8,8 +8,11 @@
 
     {% if user.is_authenticated %}
         <div id="buttonsContainer">
-        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#uploadModal"><i class="fas fa-upload"></i> File</button>
-        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#newDirModal"><i class="fas fa-plus-circle"></i> Folder</button>
+            <button type="button" id="toggleShare" class="btn btn-toggle" data-toggle="button" aria-pressed="false" autocomplete="off">
+                <div class="handle"></div>
+            </button>
+            <button type="button" class="btn btn-outline-primary notForShare" data-toggle="modal" data-target="#uploadModal"><i class="fas fa-upload"></i> File</button>
+            <button type="button" class="btn btn-outline-primary notForShare" data-toggle="modal" data-target="#newDirModal"><i class="fas fa-plus-circle"></i> Folder</button>
         </div>
         <div id="fileApp">
             <ol class="breadcrumb" id="path">
@@ -34,14 +37,15 @@
                 <div v-for="dir in directories" v-cloak class="directory" v-show="!loader" v-on:click="openDir(dir.id, dir.name, $event)"
                      v-on:mouseover="dir.menuShown = true" v-on:mouseleave="dir.menuShown = false">
                     <i class="fas fa-lg fa-folder fileIcon"></i>
-                    <span>[[ dir.name ]]</span>
-                    <div class="dropdown" v-if="dir.menuShown">
+                    <span v-if="dir.name == '..'"><i class="fas fa-level-up-alt"></i></span>
+                    <span v-else>[[ dir.name ]]</span>
+                    <div class="dropdown" v-if="dir.menuShown && dir.name != '..'">
                         <button class="btn btn-secondary" type="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                            <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Delete</a>
+                            <a class="dropdown-item notForShare" href="#">Delete</a>
                             <a class="dropdown-item" href="#">Rename</a>
                             <a class="dropdown-item" href="#">Download</a>
                         </div>
@@ -88,7 +92,7 @@
                                         <span class="d-none d-sm-inline-block">Share</span>
                                     </button>
                                 </div>
-                                <div class="col-3 col-md-12">
+                                <div class="col-3 col-md-12 notForShare">
                                     <button type="button" class="btn btn-outline-danger" id="deleteFileBtn">
                                         <i class="fas fa-trash"></i>
                                         <span class="d-none d-sm-inline-block">Delete</span>
@@ -132,8 +136,8 @@
                         <progress max="100" value="0" id="uploadProgress"></progress>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" id="uploadBtn">Upload</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="uploadBtn">Upload</button>
                     </div>
                 </div>
             </div>

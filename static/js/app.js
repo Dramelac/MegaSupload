@@ -41,7 +41,12 @@ async function loadDir(dirId, dirName, event) {
     this.loader = true;
     this.files = [];
     this.directories = [];
-    var data = await $.getJSON('/api/file/list_item?did=' + (dirId || ''));
+    if ($('#toggleShare').attr('aria-pressed') === "true") {
+        var data = await $.getJSON('/api/share/ls');
+    } else {
+        var data = await $.getJSON('/api/file/list_item?did=' + (dirId || ''));
+    }
+
     this.files = data.file;
     this.directories = data.directory.filter(function (d) {
         return d.name !== ".";
@@ -284,6 +289,17 @@ $('#newDirBtn').on('click', async function () {
     }
 });
 
+$('#toggleShare').on('click', function () {
+    setTimeout(function () {
+        if ($('#toggleShare').attr('aria-pressed') === "true") {
+            $('.notForShare').hide()
+        } else {
+            $('.notForShare').show()
+        }
+        fileManager.openDir();
+    });
+});
+
 $('#deleteFileBtn').on('click', async function () {
     if (!fileView.fileId || !confirm('Are you sure to delete file ?')) return;
     try {
@@ -321,10 +337,6 @@ $(document).on('input', '#searchUserInput', async function () {
     };
     var val = $(this).val();
     if (!fileView.fileId) return;
-    if (val.length < 3) {
-        fileView.searchUserResults = [];
-        return;
-    }
     var data = await $.getJSON('/api/user/search?query=' + val);
     fileView.searchUserResults = data.results
 });
