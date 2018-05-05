@@ -300,11 +300,13 @@ $('#toggleShare').on('click', function () {
     });
 });
 
-$('#deleteFileBtn').on('click', async function () {
-    if (!fileView.fileId || !confirm('Are you sure to delete file ?')) return;
+$(document).on('click', '.deleteBtn', async function () {
+    var id = $(this).attr('data-id');
+    var type = $(this).attr('data-type');
+    if (!id || !type || !confirm('Are you sure to delete ' + type +' ?')) return;
     try {
-        await $.post('/api/file/remove_file', JSON.stringify({
-            fileId: fileView.fileId
+        await $.post('/api/file/remove_' + type, JSON.stringify({
+            id: id
         }));
         $('#fileDetailsModal').modal('hide');
         fileManager.openDir(currentDirId);

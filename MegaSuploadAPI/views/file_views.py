@@ -221,10 +221,22 @@ def getFileKey(request):
 @require_http_methods(["POST"])
 @json_parser
 def removeFile(request):
-    fileId = request.json.get('fileId', '').strip()
+    fileId = request.json.get('id', '').strip()
     try:
         FileDAO.remove(fileId, request.user)
         return JsonResponse({"message": 'File removed'}, status=200)
+    except (ObjectDoesNotExist, PermissionDenied):
+        return JsonResponse({"message": "Not found"}, status=404)
+
+
+@login_required
+@require_http_methods(["POST"])
+@json_parser
+def removeDirecory(request):
+    dirId = request.json.get('id', '').strip()
+    try:
+        DirectoryDAO.remove(dirId, request.user)
+        return JsonResponse({"message": 'Directory removed'}, status=200)
     except (ObjectDoesNotExist, PermissionDenied):
         return JsonResponse({"message": "Not found"}, status=404)
 

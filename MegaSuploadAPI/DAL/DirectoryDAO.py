@@ -92,7 +92,8 @@ def moveDirectory(directory, newParent, user):
 
 
 # Only for owner (for now)
-def removeDirectory(directory, user):
+def remove(dirId, user):
+    directory = getDirectoryFromId(dirId, user)
     perm = PermissionDAO.getPermission(directory, user)
     if perm.owner and directory.parent is not None:
         fileList = FileDAO.listFiles(directory, user)
