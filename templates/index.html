@@ -83,7 +83,7 @@
                                     </button>
                                 </div>
                                 <div class="col-3 col-md-12">
-                                    <button type="button" class="btn btn-outline-primary" id="shareFileBtn">
+                                    <button type="button" class="btn btn-outline-primary" id="shareFileBtn" v-on:click="fileView.searchIsActive = true">
                                         <i class="fas fa-share-alt"></i>
                                         <span class="d-none d-sm-inline-block">Share</span>
                                     </button>
@@ -94,7 +94,19 @@
                                         <span class="d-none d-sm-inline-block">Delete</span>
                                     </button>
                                 </div>
-                                <div class="col-4 col-md-12">Size: [[ size | prettyBytes ]]</div>
+                                <div class="col-12">Size: [[ size | prettyBytes ]]</div>
+                                <div class="col-12" v-if="searchIsActive">
+                                    <label for="searchUserInput">Search a user :</label>
+                                    <input type="search" id="searchUserInput">
+                                    <div v-for="user in searchUserResults" class="searchUserDiv" v-bind:data-userid="user.id" v-bind:data-name="user.username">Share with: [[ user.username ]]</div>
+                                    <div id="checkSharePermissions" v-if="userSelected.id">
+                                        [[ userSelected.name ]] <br>
+                                        <label>Read</label><input type="checkbox" checked disabled>
+                                        <label>Write</label><input type="checkbox" id="writePerm">
+                                        <label>Share</label><input type="checkbox" id="sharePerm">
+                                        <button type="button" id="submitShareBtn" class="btn btn-success">Share !</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

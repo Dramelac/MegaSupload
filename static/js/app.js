@@ -2,8 +2,8 @@ var currentDirId;
 
 Vue.filter('prettyBytes', function (num) {
     if (!num) return 0;
-    var i = Math.floor( Math.log(num) / Math.log(1024) );
-    return ( num / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+    var i = Math.floor(Math.log(num) / Math.log(1024));
+    return (num / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
 });
 
 function getFileIcon(mimeType) {
@@ -115,7 +115,7 @@ var fileManager = new Vue({
         files: [],
         loader: true,
         paths: [],
-        isOk : false,
+        isOk: false,
         viewMenu: false,
         top: '0px',
         left: '0px'
@@ -155,12 +155,29 @@ var fileView = new Vue({
         fileId: null,
         fileName: "",
         size: 0,
-        link: ''
+        link: '',
+        searchIsActive: false,
+        searchUserResults: [],
+        userSelected: {
+            id: null,
+            name: null
+        }
+    },
+    methods: {
+        resetSearch: function() {
+            this.searchIsActive = false;
+            this.searchUserResults = [];
+            this.userSelected = {
+                id: null,
+                name: null
+            };
+        }
     }
 });
 
 $('#fileDetailsModal').on('hidden.bs.modal', function (e) {
     $('#fileDetailsModal .modal-body #fileContent').html('');
+    fileView.resetSearch();
 });
 
 $('#uploadModal').on('hidden.bs.modal', function (e) {
@@ -297,17 +314,40 @@ $('#renameFileBtn').on('click', async function () {
     }
 });
 
-$('#shareFileBtn').on('click', async function () {
-    if (!fileView.fileId || !newName) return;
+$(document).on('input', '#searchUserInput', async function () {
+    fileView.userSelected = {
+        id: null,
+        name: null
+    };
+    var val = $(this).val();
+    if (!fileView.fileId) return;
+    if (val.length < 3) {
+        fileView.searchUserResults = [];
+        return;
+    }
+    var data = await $.getJSON('/api/user/search?query=' + val);
+    fileView.searchUserResults = data.results
+});
+
+$(document).on('click', '.searchUserDiv', function () {
+    fileView.searchUserResults = [];
+    fileView.userSelected.id = $(this).attr('data-userid');
+    fileView.userSelected.name = $(this).attr('data-name');
+});
+$(document).on('click', '#submitShareBtn', async function () {
     try {
-        await $.post('/api/file/rename_file', JSON.stringify({
-            fileId: fileView.fileId,
-            name: newName
+        var res = await $.post('/api/share/share', JSON.stringify({
+            'elementId': fileView.fileId,
+            'targetUserId': fileView.userSelected.id,
+            'encryptedKey': 'TODO',
+            'read': 1,
+            'write': $('#writePerm').is(":checked"),
+            'share': $('#sharePerm').is(":checked")
         }));
-        $('#fileDetailsModal').modal('hide');
-        fileManager.openDir(currentDirId);
-        dataCounter.loadDataCounter();
-    } catch (err) {
-        alert(err.responseJSON.message);
+        fileView.resetSearch();
+        alert(res.message)
+    } catch (e) {
+        alert(e.responseJSON.message)
     }
 });
+

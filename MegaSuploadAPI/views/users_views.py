@@ -133,7 +133,7 @@ def search(request):
     query = request.GET.get('query', '')
     if not query:
         return JsonResponse({"message": "Bad inputs."}, status=400)
-    results = User.objects.annotate(rank=SearchRank(SearchVector('username'), SearchQuery(query))).filter(rank__gt=0).order_by('-rank').values('id', 'username')[:5]
+    results = User.objects.annotate(rank=SearchRank(SearchVector('username'), SearchQuery(query))).exclude(id=request.user.id).filter(rank__gt=0).order_by('-rank').values('id', 'username')[:5]
     return JsonResponse({
         'results': list(results)
     }, status=200)

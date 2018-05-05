@@ -139,3 +139,15 @@ progress::-webkit-progress-value {
     font-size: 20px;
     margin-top: -5px;
 }
+#searchUserInput {
+    line-height: initial;
+}
+.searchUserDiv {
+    color: white;
+    background: #617298;
+    margin-top: 3px;
+    cursor: pointer;
+}
+.searchUserDiv:hover {
+    background: #3b5998;
+}

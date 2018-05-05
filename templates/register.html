@@ -4,6 +4,16 @@
 {% block body %}
     <h1>Register</h1>
 
+    <div class="row">
+        <a href="{% url 'social:begin' 'facebook' %}" class="col-lg-6 offset-lg-3 btn_connect btn_fb">
+            <img src="{% static "img/FB-f-Logo__white_100.png" %}" alt="FB_icon"/>Register with Facebook
+        </a>
+    </div>
+    <div class="row">
+        <a href="{% url 'social:begin' 'google-oauth2' %}" class="col-lg-6 offset-lg-3 btn_connect btn_google">
+            <img src="{% static "img/logo_google_plus.png" %}" alt="FB_icon"/>Register with Google +
+        </a>
+    </div>
 
     <form class="col-md-6 offset-md-3" method="post" id="register-form">
         <div id="error-msg"></div>
