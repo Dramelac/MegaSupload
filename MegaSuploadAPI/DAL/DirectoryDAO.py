@@ -97,7 +97,7 @@ def removeDirectory(directory, user):
     if perm.owner and directory.parent is not None:
         fileList = FileDAO.listFiles(directory, user)
         for file in fileList:
-            FileDAO.remove(file['id'], user)
+            FileDAO.remove(file['id'], user, True)
         dirList = Directory.objects.filter(parent=directory)
         for current_dir in dirList:
             removeDirectory(current_dir, user)

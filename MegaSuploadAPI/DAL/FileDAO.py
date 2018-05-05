@@ -114,10 +114,10 @@ def listFiles(directory, user):
     return list(result)
 
 
-def remove(fileId, user):
+def remove(fileId, user, bypass=False):
     file = getFileFromId(fileId, user)
     perm = PermissionDAO.getPermission(file, user)
-    if perm is not None and perm.owner:
+    if bypass or (perm is not None and perm.owner):
         PermissionDAO.remove(user, user, file)
         dataSize = file.size
 
@@ -128,6 +128,8 @@ def remove(fileId, user):
         if user.data_used < 0:
             user.data_used = 0
         user.save()
+    else:
+        raise PermissionDenied
 
 
 def getFileIdFromName(fileName, directoryId, user):
