@@ -42,18 +42,34 @@
                     <div class="dropdown" v-if="dir.menuShown && dir.name != '..'">
                         <button class="btn btn-secondary" type="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                           <i class="fas fa-ellipsis-h"></i>
+                            <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item deleteBtn notForShare" href="#" v-bind:data-id="dir.id" data-type="dir">Delete</a>
-                            <a class="dropdown-item" href="#">Rename</a>
                             <a class="dropdown-item" href="#">Download all as ZIP</a>
+                            <a class="dropdown-item renameBtn" href="#" v-bind:data-id="dir.id" data-type="dir">Rename</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item deleteBtn" href="#" v-bind:data-id="dir.id"
+                               data-type="dir">Delete</a>
                         </div>
                     </div>
                 </div>
-                <div v-for="file in files" v-cloak class="file" v-show="!loader" v-on:click="fileClicked(file.id)">
+                <div v-for="file in files" v-cloak class="file" v-show="!loader" v-on:click="fileClicked(file.id, $event)"
+                     v-on:mouseover="file.menuShown = true" v-on:mouseleave="file.menuShown = false">
                     <i class="far fa-lg fileIcon" :class="getFileIcon(file.type)"></i>
                     <span>[[ file.name ]]</span>
+                    <div class="dropdown" v-if="file.menuShown">
+                        <button class="btn btn-secondary" type="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" v-bind:href="file.link" target="_blank">Download</a>
+                            <a class="dropdown-item renameBtn" href="#" v-bind:data-id="file.id" data-type="file">Rename</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item deleteBtn" href="#" v-bind:data-id="file.id"
+                               data-type="file">Delete</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -63,7 +79,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">[[ fileName ]]</h5>
+                        <h5 class="modal-title">[[ file.name ]]</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -73,7 +89,7 @@
                         <div id="fileDetails" class="col-12 order-1 col-md-3 order-md-2">
                             <div class="row">
                                 <div class="col-3 col-md-12">
-                                    <a v-bind:href="link" target="_blank">
+                                    <a v-bind:href="file.link" target="_blank">
                                         <button type="button" class="btn btn-primary">
                                             <i class="fas fa-download"></i>
                                             <span class="d-none d-sm-inline-block">Download</span>
@@ -81,24 +97,24 @@
                                     </a>
                                 </div>
                                 <div class="col-3 col-md-12">
-                                    <button type="button" class="btn btn-outline-primary" id="renameFileBtn">
+                                    <button type="button" class="btn btn-outline-primary renameBtn" v-bind:data-id="file.id" data-type="file">
                                         <i class="fas fa-pencil-alt"></i>
                                         <span class="d-none d-sm-inline-block">Rename</span>
                                     </button>
                                 </div>
                                 <div class="col-3 col-md-12">
-                                    <button type="button" class="btn btn-outline-primary" id="shareFileBtn" v-on:click="fileView.searchIsActive = true">
+                                    <button type="button" class="btn btn-outline-primary" id="shareFileBtn" v-on:click="searchIsActive = true">
                                         <i class="fas fa-share-alt"></i>
                                         <span class="d-none d-sm-inline-block">Share</span>
                                     </button>
                                 </div>
                                 <div class="col-3 col-md-12 notForShare">
-                                    <button type="button" class="btn btn-outline-danger deleteBtn" v-bind:data-id="fileId" data-type="file">
+                                    <button type="button" class="btn btn-outline-danger deleteBtn" v-bind:data-id="file.id" data-type="file">
                                         <i class="fas fa-trash"></i>
                                         <span class="d-none d-sm-inline-block">Delete</span>
                                     </button>
                                 </div>
-                                <div class="col-12">Size: [[ size | prettyBytes ]]</div>
+                                <div class="col-12">Size: [[ file.size | prettyBytes ]]</div>
                                 <div class="col-12" v-if="searchIsActive">
                                     <label for="searchUserInput">Search a user :</label>
                                     <input type="search" id="searchUserInput">

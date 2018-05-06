@@ -47,7 +47,11 @@ async function loadDir(dirId, dirName, event) {
         var data = await $.getJSON('/api/file/list_item?did=' + (dirId || ''));
     }
 
-    this.files = data.file;
+    this.files = data.file.map(function (f) {
+        f.link = '/api/file/download?did=' + f.directory_id + '&fid=' + f.id;
+        f.menuShown = false;
+        return f;
+    });
     this.directories = data.directory.filter(function (d) {
         return d.name !== ".";
     }).map(function (d) {
@@ -74,28 +78,25 @@ async function loadDir(dirId, dirName, event) {
     }
 }
 
-function fileClicked(fileId) {
+function fileClicked(fileId, event) {
+    if (typeof event !== 'undefined' && (event.target.tagName === 'BUTTON' || event.target.tagName === 'A')) return;
     var file = this.files.find(function (f) {
         return f.id == fileId;
     })
-    var link = '/api/file/download?did=' + file.directory_id + '&fid=' + fileId;
     var el = document.createElement("i");
     el.className = "fas " + getFileIcon(file.type);
     if (/image/.test(file.type)) {
         el = new Image();
-        el.src = link;
+        el.src = file.link
     } else if (/mp4/.test(file.type)) {
-        el = newPLayer('video', link, file.type);
+        el = newPLayer('video', file.link, file.type);
     } else if (/audio/.test(file.type)) {
-        el = newPLayer('audio', link, file.type);
+        el = newPLayer('audio', file.link, file.type);
     } else if (/pdf/.test(file.type)) {
         el = document.createElement("iframe");
-        el.src = link;
+        el.src = file.link;
     }
-    fileView.fileId = file.id;
-    fileView.fileName = file.name;
-    fileView.link = link;
-    fileView.size = file.size;
+    fileView.file = file;
     $('#fileDetailsModal .modal-body #fileContent').html(el);
     $("#fileDetailsModal").modal('show')
 }
@@ -157,10 +158,12 @@ var fileView = new Vue({
     el: '#fileDetailsModal',
     delimiters: ['[[', ']]'],
     data: {
-        fileId: null,
-        fileName: "",
-        size: 0,
-        link: '',
+        file: {
+            id: null,
+            name: "",
+            size: 0,
+            link: '',
+        },
         searchIsActive: false,
         searchUserResults: [],
         userSelected: {
@@ -316,12 +319,14 @@ $(document).on('click', '.deleteBtn', async function () {
     }
 });
 
-$('#renameFileBtn').on('click', async function () {
-    var newName = prompt('Enter new file name');
-    if (!fileView.fileId || !newName) return;
+$(document).on('click', '.renameBtn', async function () {
+    var type = $(this).attr('data-type');
+    var newName = prompt('Enter new  ' + type + ' name');
+    var id = $(this).attr('data-id');
+    if (!id || !type || !newName) return;
     try {
-        await $.post('/api/file/rename_file', JSON.stringify({
-            fileId: fileView.fileId,
+        await $.post('/api/file/rename_' + type, JSON.stringify({
+            id: id,
             name: newName
         }));
         $('#fileDetailsModal').modal('hide');
@@ -338,7 +343,7 @@ $(document).on('input', '#searchUserInput', async function () {
         name: null
     };
     var val = $(this).val();
-    if (!fileView.fileId) return;
+    if (!fileView.file.id) return;
     var data = await $.getJSON('/api/user/search?query=' + val);
     fileView.searchUserResults = data.results
 });
@@ -351,7 +356,7 @@ $(document).on('click', '.searchUserDiv', function () {
 $(document).on('click', '#submitShareBtn', async function () {
     try {
         var res = await $.post('/api/share/share', JSON.stringify({
-            'elementId': fileView.fileId,
+            'elementId': fileView.file.id,
             'targetUserId': fileView.userSelected.id,
             'encryptedKey': 'TODO',
             'read': 1,

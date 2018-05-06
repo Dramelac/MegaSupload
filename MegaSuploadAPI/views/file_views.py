@@ -125,7 +125,7 @@ def addDirectory(request):
 @login_required
 @json_parser
 def renameDirectory(request):
-    elementId = request.json.get('uuid', '').strip()
+    elementId = request.json.get('id', '').strip()
     name = request.json.get('name', '').strip()
     if not elementId or not name:
         return JsonResponse({"message": "Bad input"}, status=400)
@@ -145,7 +145,7 @@ def renameDirectory(request):
 @login_required
 @json_parser
 def renameFile(request):
-    fileId = request.json.get('fileId', '').strip()
+    fileId = request.json.get('id', '').strip()
     name = request.json.get('name', '').strip()
     if not fileId or not name:
         return JsonResponse({"message": "Bad input"}, status=400)
