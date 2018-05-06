@@ -61,20 +61,25 @@ async function loadDir(dirId, dirName, event) {
         return a - b;
     });
     this.loader = false;
-    currentDirId = data.directory.find(function (d) {
-        return d.type === "current";
-    }).id;
-    var curIndex = this.paths.findIndex(function (d) {
-        return d.id === currentDirId;
-    });
-    if (curIndex > -1) {
-        this.paths.length = curIndex + 1;
+    if ($('#toggleShare').attr('aria-pressed') === "true") {
+        currentDirId = null;
+        this.paths = []
     } else {
-        this.paths.push({
-            name: dirName,
-            id: currentDirId,
-            show: !!dirId
-        })
+        currentDirId = data.directory.find(function (d) {
+            return d.type === "current";
+        }).id;
+        var curIndex = this.paths.findIndex(function (d) {
+            return d.id === currentDirId;
+        });
+        if (curIndex > -1) {
+            this.paths.length = curIndex + 1;
+        } else {
+            this.paths.push({
+                name: dirName,
+                id: currentDirId,
+                show: !!dirId
+            })
+        }
     }
 }
 

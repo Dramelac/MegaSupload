@@ -13,6 +13,7 @@
             </button>
             <button type="button" class="btn btn-outline-primary notForShare" data-toggle="modal" data-target="#uploadModal"><i class="fas fa-upload"></i> File</button>
             <button type="button" class="btn btn-outline-primary notForShare" data-toggle="modal" data-target="#newDirModal"><i class="fas fa-plus-circle"></i> Folder</button>
+            <button type="button" class="btn btn-outline-primary notForShare" onclick="window.open('/api/file/download_dir?dirId=' + currentDirId)"><i class="fas fa-download"></i> Download folder</button>
         </div>
         <div id="fileApp">
             <ol class="breadcrumb" id="path">
@@ -45,11 +46,11 @@
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" v-bind:href="'/api/file/download_dir?dirId=' + dir.id">Download all as ZIP</a>
-                            <a class="dropdown-item renameBtn" href="#" v-bind:data-id="dir.id" data-type="dir">Rename</a>
+                            <a class="dropdown-item" v-bind:href="'/api/file/download_dir?dirId=' + dir.id"><i class="fas fa-download"></i>Download all as ZIP</a>
+                            <a class="dropdown-item renameBtn" href="#" v-bind:data-id="dir.id" data-type="dir"><i class="fas fa-pencil-alt"></i>Rename</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item deleteBtn" href="#" v-bind:data-id="dir.id"
-                               data-type="dir">Delete</a>
+                               data-type="dir"><i class="fas fa-trash"></i>Delete</a>
                         </div>
                     </div>
                 </div>
@@ -63,11 +64,11 @@
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" v-bind:href="file.link" target="_blank">Download</a>
-                            <a class="dropdown-item renameBtn" href="#" v-bind:data-id="file.id" data-type="file">Rename</a>
+                            <a class="dropdown-item" v-bind:href="file.link" target="_blank"><i class="fas fa-download"></i>Download</a>
+                            <a class="dropdown-item renameBtn" href="#" v-bind:data-id="file.id" data-type="file"><i class="fas fa-pencil-alt"></i>Rename</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item deleteBtn" href="#" v-bind:data-id="file.id"
-                               data-type="file">Delete</a>
+                               data-type="file"><i class="fas fa-trash"></i>Delete</a>
                         </div>
                     </div>
                 </div>

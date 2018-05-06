@@ -4,7 +4,7 @@ from uuid import UUID
 from django.conf import settings
 from random import randint
 from zipfile import ZipFile, ZIP_DEFLATED
-from MegaSuploadAPI.DAL import FileDAO
+from MegaSuploadAPI.DAL import FileDAO, DirectoryDAO
 
 
 # Use File System (for now)
@@ -42,12 +42,24 @@ def remove_file(directory, fileId):
         print("Error: %s - %s." % (e.filename, e.strerror))
 
 
-def zip_dir(directory, user):
-    zip_file_name = '/tmp/%s.zip' % randint(0, 1000000000)
-    zip_file = ZipFile(zip_file_name, "w", ZIP_DEFLATED)
+def recursive_zip(directory, curr_path, root_dir, zip_file, user):
     file_list = FileDAO.listFiles(directory, user)
     for f in file_list:
-        zip_file.write(filename=settings.ROOT_PATH + directory.getRootPath() + str(f['id']), arcname=f['name'])
+        f_name = curr_path + '/' + f['name'] if curr_path is not None else f['name']
+        zip_file.write(filename=root_dir + str(f['id']), arcname=f_name)
+    dir_list = DirectoryDAO.listDirectory(directory, user)
+    for d in dir_list:
+        if not 'type' in d:
+            dir_obj = DirectoryDAO.getDirectoryFromId(d['id'], user)
+            new_curr_path = curr_path + '/' + d['name'] if curr_path is not None else d['name']
+            recursive_zip(dir_obj, new_curr_path, root_dir, zip_file, user)
+
+
+def zip_dir(directory, user):
+    zip_file_name = '/tmp/%s.zip' % randint(0, 1000000000)
+    root_dir = settings.ROOT_PATH + directory.getRootPath()
+    zip_file = ZipFile(zip_file_name, "w", ZIP_DEFLATED)
+    recursive_zip(directory, None, root_dir, zip_file, user)
     zip_file.close()
     file_data = open(zip_file_name, 'rb')
     data = file_data.read()
