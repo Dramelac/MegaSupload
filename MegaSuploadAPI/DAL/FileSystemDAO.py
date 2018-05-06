@@ -2,6 +2,9 @@ import os
 from uuid import UUID
 
 from django.conf import settings
+from random import randint
+from zipfile import ZipFile, ZIP_DEFLATED
+from MegaSuploadAPI.DAL import FileDAO
 
 
 # Use File System (for now)
@@ -37,3 +40,17 @@ def remove_file(directory, fileId):
         os.remove(settings.ROOT_PATH + directory.getRootPath() + str(fileId))
     except OSError as e:
         print("Error: %s - %s." % (e.filename, e.strerror))
+
+
+def zip_dir(directory, user):
+    zip_file_name = '/tmp/%s.zip' % randint(0, 1000000000)
+    zip_file = ZipFile(zip_file_name, "w", ZIP_DEFLATED)
+    file_list = FileDAO.listFiles(directory, user)
+    for f in file_list:
+        zip_file.write(filename=settings.ROOT_PATH + directory.getRootPath() + str(f['id']), arcname=f['name'])
+    zip_file.close()
+    file_data = open(zip_file_name, 'rb')
+    data = file_data.read()
+    file_data.close()
+    return data
+

@@ -72,6 +72,26 @@ def download(request):
         return JsonResponse({"message": "Not found"}, status=404)
 
 
+@login_required
+def downloadDir(request):
+    dirId = request.GET.get("dirId", '')
+    try:
+        directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
+    except (ObjectDoesNotExist, PermissionDenied):
+        return JsonResponse({"message": "Not found"}, status=404)
+    except FieldError:
+        return JsonResponse({"message": "Bad input"}, status=400)
+
+    try:
+        zip_file = FileSystemDAO.zip_dir(directory, request.user)
+        response = HttpResponse(zip_file, content_type='application/zip')
+        response['Content-Disposition'] = 'inline; filename*=UTF-8\'\'%s' % urllib.parse.quote(
+            directory.name.encode('utf-8'))
+        return response
+    except Exception as e:
+        raise
+
+
 @csrf_exempt
 @login_required
 def test(request):
@@ -232,7 +252,7 @@ def removeFile(request):
 @login_required
 @require_http_methods(["POST"])
 @json_parser
-def removeDirecory(request):
+def removeDirectory(request):
     dirId = request.json.get('id', '').strip()
     try:
         DirectoryDAO.remove(dirId, request.user)

@@ -45,7 +45,7 @@
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Download all as ZIP</a>
+                            <a class="dropdown-item" v-bind:href="'/api/file/download_dir?dirId=' + dir.id">Download all as ZIP</a>
                             <a class="dropdown-item renameBtn" href="#" v-bind:data-id="dir.id" data-type="dir">Rename</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item deleteBtn" href="#" v-bind:data-id="dir.id"
