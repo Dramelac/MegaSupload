@@ -171,6 +171,12 @@ progress::-webkit-progress-value {
     background: white;
     color: #0060ff;
 }
+.dropdown-item:hover {
+    color: white;
+    background: #0060ff;
+}.dropdown-item svg {
+    margin-right: 15px;
+}
 #searchUserInput {
     line-height: initial;
 }
