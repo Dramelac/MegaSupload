@@ -11,9 +11,18 @@
             <button type="button" id="toggleShare" class="btn btn-toggle" data-toggle="button" aria-pressed="false" autocomplete="off">
                 <div class="handle"></div>
             </button>
-            <button type="button" class="btn btn-outline-primary notForShare" data-toggle="modal" data-target="#uploadModal"><i class="fas fa-upload"></i> File</button>
-            <button type="button" class="btn btn-outline-primary notForShare" data-toggle="modal" data-target="#newDirModal"><i class="fas fa-plus-circle"></i> Folder</button>
-            <button type="button" class="btn btn-outline-primary notForShare" onclick="window.open('/api/file/download_dir?dirId=' + currentDirId)"><i class="fas fa-download"></i> Download folder</button>
+            <button type="button" class="btn btn-outline-primary notForShare" data-toggle="modal" data-target="#uploadModal">
+                <i class="fas fa-upload"></i>
+                <span class="d-none d-sm-inline-block"> File</span>
+            </button>
+            <button type="button" class="btn btn-outline-primary notForShare" data-toggle="modal" data-target="#newDirModal">
+                <i class="fas fa-plus-circle"></i>
+                <span class="d-none d-sm-inline-block"> Folder</span>
+            </button>
+            <button type="button" class="btn btn-outline-primary notForShare" onclick="window.open('/api/file/download_dir?dirId=' + currentDirId)">
+                <i class="fas fa-download"></i>
+                <span class="d-none d-sm-inline-block"> Download folder</span>
+            </button>
         </div>
         <div id="fileApp">
             <ol class="breadcrumb" id="path">
@@ -41,7 +50,7 @@
                     <span v-if="dir.name == '..'"><i class="fas fa-level-up-alt"></i></span>
                     <span v-else>[[ dir.name ]]</span>
                     <div class="dropdown" v-if="dir.menuShown && dir.name != '..'">
-                        <button class="btn btn-secondary" type="button"
+                        <button class="btn" type="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-ellipsis-h"></i>
                         </button>

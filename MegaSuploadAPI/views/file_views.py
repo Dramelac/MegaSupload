@@ -128,7 +128,8 @@ def addDirectory(request):
     dirId = request.json.get('dirId', '').strip()
     name = request.json.get('name', '').strip()
     user = request.user
-
+    if not dirId or not name:
+        return JsonResponse({"message": "Bad input"}, status=400)
     try:
         directory = DirectoryDAO.getDirectoryFromId(dirId, user)
         perm = PermissionDAO.getPermission(directory, user)

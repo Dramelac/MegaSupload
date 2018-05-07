@@ -1,10 +1,40 @@
 [v-cloak] {
     display: none;
 }
+.navbar {
+    background: #0060ff;
+    margin-bottom: 20px;
+}
+.navbar a:not(.navbar-brand) {
+    display: inline-block;
+    margin-left: 20px;
+    padding: 0 10px;
+    color: white;
+    font-weight: bold;
+    line-height: 40px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all .2s ease-in-out;
+}
+.navbar a:not(.navbar-brand):hover {
+    color: #0060ff;
+    background: white;
+}
+@media (max-width: 767px) {
+    .navbar a:not(.navbar-brand) {
+        margin-left: 0;
+        margin-top: 7px;
+        width: 100%;
+    }
+}
+.navbar-text {
+    font-weight: bold;
+    color: white;
+}
 #filesContainer {
     padding: 10px;
     border: 2px solid #e3e3e3;
-    height: calc(100vh - 165px);
+    height: calc(100vh - 200px);
     min-height: 300px;
     overflow: auto;
 }
@@ -16,7 +46,7 @@
 }
 .file:hover, .directory:hover {
     color: white;
-    background: #45709f;
+    background: #0060ff;
 }
 .fileIcon{
     width: 25px !important;
@@ -138,6 +168,8 @@ progress::-webkit-progress-value {
     padding: 0px 8px;
     font-size: 20px;
     margin-top: -5px;
+    background: white;
+    color: #0060ff;
 }
 #searchUserInput {
     line-height: initial;
