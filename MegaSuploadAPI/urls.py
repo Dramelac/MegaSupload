@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path, include, re_path
 
 from MegaSuploadAPI.views import users_views, file_views
 
@@ -6,6 +6,7 @@ urlpatterns = [
     path('auth/register', users_views.register),
     path('auth/login', users_views.login),
     path('auth/logout', users_views.logout, name="logout"),
+    re_path(r'^oauth/complete/(?P<backend>[^/]+)/$', users_views.complete),
     path('oauth/', include('social_django.urls', namespace='social')),
     path('user/update_profile', users_views.update_profile),
     path('user/ratio', users_views.get_ratio),

@@ -240,7 +240,7 @@ $("#uploadBtn").on('click', async function () {
     }));
     $('#uploadProgress').val(0).show();
     var fileKeyDecrypted = "";
-    if (reqFileExist.isFileExist) {
+    if (reqFileExist.isFileExist && localStorage.priv_key) {
         var reqFileKey = await $.post('/api/file/get_key', JSON.stringify({
             'fileId': reqFileExist.fileId
         }));

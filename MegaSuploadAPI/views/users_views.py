@@ -7,6 +7,11 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 
+from social.actions import do_complete
+from social_django.utils import psa
+from social_django.views import _do_login
+from social_core.exceptions import AuthCanceled
+
 from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO
 from MegaSuploadAPI.models import *
 from MegaSuploadAPI.tools.decorators import json_parser
@@ -76,6 +81,27 @@ def login(request):
 def logout(request):
     auth_logout(request)
     return HttpResponseRedirect("/")
+
+
+@psa('social:complete')
+def complete(request, *args, **kwargs):
+    try:
+        res = do_complete(request.backend, _do_login, request.user, *args, **kwargs)
+    except AuthCanceled:
+        return HttpResponseRedirect("/")
+    try:
+        DirectoryDAO.getRootDirectory(request.user)
+    except Directory.DoesNotExist:
+        user = User.objects.get(id=request.user.id)
+        key = RSA.generate(2048)
+        user.encrypted_priv_key = key.exportKey(passphrase="supinfo", pkcs=8, protection="scryptAndAES128-CBC").decode("utf8")
+        user.pub_key = key.publickey().exportKey().decode("utf8")
+        user.save()
+        directory = DirectoryDAO.addDirectory(request.user, request.user.id)
+        FileSystemDAO.initRootDirectory(directory)
+
+
+    return res
 
 
 @login_required
