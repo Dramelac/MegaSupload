@@ -8,6 +8,7 @@ urlpatterns = [
     path('auth/logout', users_views.logout, name="logout"),
     re_path(r'^oauth/complete/(?P<backend>[^/]+)/$', users_views.complete),
     path('oauth/', include('social_django.urls', namespace='social')),
+    path('user/get_profile', users_views.get_profile),
     path('user/update_profile', users_views.update_profile),
     path('user/ratio', users_views.get_ratio),
     path('user/search', users_views.search),

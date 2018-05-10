@@ -99,9 +99,17 @@ def complete(request, *args, **kwargs):
         user.save()
         directory = DirectoryDAO.addDirectory(request.user, request.user.id)
         FileSystemDAO.initRootDirectory(directory)
-
-
     return res
+
+
+@login_required
+def get_profile(request):
+    return JsonResponse({
+        'username': request.user.username,
+        'first_name': request.user.first_name,
+        'last_name': request.user.last_name,
+        'email': request.user.email
+    }, status=200)
 
 
 @login_required
