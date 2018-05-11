@@ -22,7 +22,7 @@ function getFileIcon(mimeType) {
         'application/vnd.ms-powerpoint': 'fa-file-powerpoint',
         'application/vnd.openxmlformatsfficedocument.presentationml': 'fa-file-powerpoint',
         'application/vnd.oasis.opendocument.presentation': 'fa-file-powerpoint',
-        'text/plain': 'fa-file-text',
+        'text/plain': 'fa-file-alt',
         'text/html': 'fa-file-code',
         'application/json': 'fa-file-code',
         'application/gzip': 'fa-file-archive',
@@ -97,7 +97,7 @@ function fileClicked(fileId, event) {
         el = newPLayer('video', file.link, file.type);
     } else if (/audio/.test(file.type)) {
         el = newPLayer('audio', file.link, file.type);
-    } else if (/pdf/.test(file.type)) {
+    } else if (/pdf|text/.test(file.type)) {
         el = document.createElement("iframe");
         el.src = file.link;
     }
@@ -187,6 +187,28 @@ var fileView = new Vue({
         }
     }
 });
+
+
+Vue.component('dir-item', {
+    template: '#dirTemplate',
+    delimiters: ['[[', ']]'],
+    props: {
+        model: Object
+    },
+});
+
+
+var moveVue = new Vue({
+    el: '#moveModal',
+    delimiters: ['[[', ']]'],
+    data: {
+        id: null,
+        name: null,
+        type: null,
+        tree: {}
+    }
+});
+
 
 $('#fileDetailsModal').on('hidden.bs.modal', function (e) {
     $('#fileDetailsModal .modal-body #fileContent').html('');
@@ -375,3 +397,37 @@ $(document).on('click', '#submitShareBtn', async function () {
     }
 });
 
+$(document).on('click', '.moveBtn', async function () {
+    moveVue.type = $(this).attr('data-type');
+    moveVue.id = $(this).attr('data-id');
+    moveVue.name = $(this).attr('data-name');
+    try {
+        var data = await $.getJSON('/api/file/get_tree');
+        data.name = 'HOME';
+        moveVue.tree = data;
+        $('#fileDetailsModal').modal('hide');
+        $('#moveModal').modal('show');
+    } catch (err) {
+        alert(err.responseJSON.message);
+    }
+});
+
+$(document).on('click', '.dirItem', async function () {
+    var target = $(this).attr('data-dirid');
+    if (!target || !moveVue.type || !moveVue.id) return;
+    try {
+        var data = {
+            'targetDirId': target
+        };
+        if (moveVue.type === 'file'){
+            data.fileId = moveVue.id
+        } else {
+            data.dirId = moveVue.id
+        }
+        await $.post('/api/file/move_' + moveVue.type, JSON.stringify(data));
+        $('#moveModal').modal('hide');
+        fileManager.openDir(currentDirId);
+    } catch (err) {
+        alert(err.responseJSON.message);
+    }
+});

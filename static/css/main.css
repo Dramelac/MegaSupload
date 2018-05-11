@@ -278,3 +278,17 @@ progress::-webkit-progress-value {
 #buttonsContainer button {
     margin-right: 20px;
 }
+
+#moveModal ul {
+    list-style-type: none!important;
+}
+.dirItem {
+    background: #908f8e;
+    color: white;
+    padding: 7px 20px;
+    margin-bottom: 5px;
+}
+.dirItem:hover {
+    background: #5a6268;
+    cursor: pointer;
+}

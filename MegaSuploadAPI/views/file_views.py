@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, FieldEr
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.forms.models import model_to_dict
 
 from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, PermissionDAO, FileKeyDAO, UserDAO
 from MegaSuploadAPI.forms import *
@@ -98,10 +99,7 @@ def downloadDir(request):
 def test(request):
     # test API method
     # put your code here ok
-    # user = request.user
-    # fileKey = FileKeyDAO.getFileKey(user, file)
-    # return JsonResponse({"message": "Executed"}, status=200)
-    return share(request)
+    return JsonResponse({'message': 'test'})
 
 
 @login_required
@@ -211,12 +209,12 @@ def moveDir(request):
 @json_parser
 def moveFile(request):
     fileId = request.json.get('fileId', '').strip()
-    dirId = request.json.get('dirId', '').strip()
+    targetDirId = request.json.get('targetDirId', '').strip()
     user = request.user
 
     try:
         file = FileDAO.getFileFromId(fileId, request.user)
-        directory = DirectoryDAO.getDirectoryFromId(dirId, request.user)
+        directory = DirectoryDAO.getDirectoryFromId(targetDirId, request.user)
     except (ObjectDoesNotExist, PermissionDenied):
         return JsonResponse({"message": "Not found"}, status=404)
     except FieldError:
@@ -319,3 +317,9 @@ def ls_shared(request):
     dir_list = PermissionDAO.getSharedDirectory(user)
     file_list = PermissionDAO.getSharedFile(user)
     return JsonResponse({"directory": dir_list, "file": file_list}, status=200)
+
+
+@login_required
+def get_tree(request):
+    tree = DirectoryDAO.getTree(DirectoryDAO.getRootDirectory(request.user), request.user)
+    return JsonResponse(tree)

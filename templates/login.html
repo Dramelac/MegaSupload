@@ -48,8 +48,8 @@
                 success: function (res) {
                     localStorage.priv_key = res.priv_key;
                     localStorage.pub_key = res.pub_key;
-                    var regex = window.location.search.substr(1).match(/next=([a-z\/]+)\&?/);
-                    window.location = regex ? regex[1] || "/" : "/";
+                    var regex = window.location.search.substr(1).match(/next=(.+)\&?/);
+                    window.location = regex ? decodeURIComponent(regex[1]) || "/" : "/";
                 },
                 error: function (err) {
                     console.log(err.responseJSON);

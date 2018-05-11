@@ -73,6 +73,19 @@ def listDirectory(directory, user):
     return result
 
 
+def getTree(directory, user):
+    tmp = dict(
+        id=directory.id,
+        name=directory.name,
+        children=[]
+    )
+    for d in listDirectory(directory, user):
+        if 'type' not in d:
+            dir_obj = getDirectoryFromId(d['id'], user)
+            tmp['children'].append(getTree(dir_obj, user))
+    return tmp
+
+
 def rename(directory, newname, user):
     perm = PermissionDAO.getPermission(directory, user)
     if perm.edit:
