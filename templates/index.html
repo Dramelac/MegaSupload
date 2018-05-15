@@ -57,6 +57,7 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" v-bind:href="'/api/file/download_dir?dirId=' + dir.id"><i class="fas fa-download"></i>Download all as ZIP</a>
                             <a class="dropdown-item renameBtn" href="#" v-bind:data-id="dir.id" data-type="dir"><i class="fas fa-pencil-alt"></i>Rename</a>
+                            <a class="dropdown-item moveBtn" href="#" v-bind:data-id="dir.id" v-bind:data-name="dir.name" data-type="dir"><i class="fas fa-arrows-alt"></i>Move</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item deleteBtn" href="#" v-bind:data-id="dir.id"
                                data-type="dir"><i class="fas fa-trash"></i>Delete</a>
@@ -75,6 +76,8 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" v-bind:href="file.link" target="_blank"><i class="fas fa-download"></i>Download</a>
                             <a class="dropdown-item renameBtn" href="#" v-bind:data-id="file.id" data-type="file"><i class="fas fa-pencil-alt"></i>Rename</a>
+                            <a class="dropdown-item" href="#" onclick="$(this).closest('.file').click();fileView.searchIsActive = true;"><i class="fas fa-share-alt"></i>Share</a>
+                            <a class="dropdown-item moveBtn" href="#" v-bind:data-id="file.id" v-bind:data-name="file.name" data-type="file"><i class="fas fa-arrows-alt"></i>Move</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item deleteBtn" href="#" v-bind:data-id="file.id"
                                data-type="file"><i class="fas fa-trash"></i>Delete</a>
@@ -98,7 +101,7 @@
                         <div id="fileContent" class="col-12 order-2 col-md-9 order-md-1"></div>
                         <div id="fileDetails" class="col-12 order-1 col-md-3 order-md-2">
                             <div class="row">
-                                <div class="col-3 col-md-12">
+                                <div class="col-4 col-md-12">
                                     <a v-bind:href="file.link" target="_blank">
                                         <button type="button" class="btn btn-primary">
                                             <i class="fas fa-download"></i>
@@ -106,25 +109,31 @@
                                         </button>
                                     </a>
                                 </div>
-                                <div class="col-3 col-md-12">
+                                <div class="col-4 col-md-12">
                                     <button type="button" class="btn btn-outline-primary renameBtn" v-bind:data-id="file.id" data-type="file">
                                         <i class="fas fa-pencil-alt"></i>
                                         <span class="d-none d-sm-inline-block">Rename</span>
                                     </button>
                                 </div>
-                                <div class="col-3 col-md-12">
+                                <div class="col-4 col-md-12">
                                     <button type="button" class="btn btn-outline-primary" id="shareFileBtn" v-on:click="searchIsActive = true">
                                         <i class="fas fa-share-alt"></i>
                                         <span class="d-none d-sm-inline-block">Share</span>
                                     </button>
                                 </div>
-                                <div class="col-3 col-md-12 notForShare">
+                                <div class="col-4 col-md-12">
+                                    <button type="button" class="btn btn-outline-primary moveBtn" v-bind:data-id="file.id" v-bind:data-name="file.name" data-type="file">
+                                        <i class="fas fa-arrows-alt"></i>
+                                        <span class="d-none d-sm-inline-block">Move</span>
+                                    </button>
+                                </div>
+                                <div class="col-4 col-md-12 notForShare">
                                     <button type="button" class="btn btn-outline-danger deleteBtn" v-bind:data-id="file.id" data-type="file">
                                         <i class="fas fa-trash"></i>
                                         <span class="d-none d-sm-inline-block">Delete</span>
                                     </button>
                                 </div>
-                                <div class="col-12">Size: [[ file.size | prettyBytes ]]</div>
+                                <div class="col-4 col-md-12"><span class="d-none d-sm-inline-block">Size:</span> [[ file.size | prettyBytes ]]</div>
                                 <div class="col-12" v-if="searchIsActive">
                                     <label for="searchUserInput">Search a user :</label>
                                     <input type="search" id="searchUserInput">
@@ -188,6 +197,36 @@
                 </div>
             </div>
         </div>
+
+        <div id="moveModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="moveModal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Move : [[ name ]]</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <ul>
+                            <dir-item :model="tree"></dir-item>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/x-template" id="dirTemplate">
+            <li>
+                <div v-bind:data-dirid="model.id" class="dirItem"><i class="fas fa-level-down-alt"></i> [[ model.name ]]</div>
+                <ul>
+                    <dir-item v-for="(model, index) in model.children" :key="index" :model="model"></dir-item>
+                </ul>
+            </li>
+        </script>
     {% endif %}
 {% endblock %}
 {% block script %}
