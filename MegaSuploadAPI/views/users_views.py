@@ -128,7 +128,7 @@ def update_profile(request):
     if pwd and psw1 != psw2:
         return JsonResponse({"message": "Password confirmation is different."}, status=400)
     if pwd and len(psw1) < 6:
-        return JsonResponse({"message": "Password is two short. Should be at least 6 characters long."}, status=400)
+        return JsonResponse({"message": "Password is too short. Should be at least 6 characters long."}, status=400)
     if re.compile(r"^[a-z0-9._-]+@[a-z0-9._-]+\.[a-z]+").match(email) is None:
         return JsonResponse({"message": "Email address is not valid."}, status=400)
     user = User.objects.get(id=request.user.id)
