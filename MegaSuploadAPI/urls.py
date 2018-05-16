@@ -27,6 +27,7 @@ urlpatterns = [
     path('file/remove_dir', file_views.removeDirectory),
     path('file/get_tree', file_views.get_tree),
     path('share/share', file_views.share),
+    path('share/public', file_views.public_share),
     path('share/ls', file_views.ls_shared),
     path('test', file_views.test),
 ]

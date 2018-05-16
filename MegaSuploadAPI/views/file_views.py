@@ -9,7 +9,7 @@ from django.forms.models import model_to_dict
 
 from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, PermissionDAO, FileKeyDAO, UserDAO
 from MegaSuploadAPI.forms import *
-from MegaSuploadAPI.models import File
+from MegaSuploadAPI.models import File, Directory
 from MegaSuploadAPI.tools.decorators import json_parser
 from MegaSuploadAPI.tools.tools import is_uuid
 
@@ -323,3 +323,61 @@ def ls_shared(request):
 def get_tree(request):
     tree = DirectoryDAO.getTree(DirectoryDAO.getRootDirectory(request.user), request.user)
     return JsonResponse(tree)
+
+
+@login_required
+def public_share(request):
+    id = request.GET.get('id', '').strip()
+    type = request.GET.get('type', '').strip()
+    if not type in ['file', 'dir']:
+        return JsonResponse({"message": "Bad inputs."}, status=400)
+    try:
+        if type == 'file':
+            element = FileDAO.getFileFromId(id, request.user)
+        else:
+            element = DirectoryDAO.getDirectoryFromId(id, request.user)
+        permission = PermissionDAO.getPermission(element, request.user)
+
+        if not permission.share:
+            raise PermissionDenied
+        return JsonResponse({"permId": permission.id}, status=200)
+    except (ObjectDoesNotExist, PermissionDenied):
+        return JsonResponse({"message": "Not found"}, status=404)
+
+
+@login_required
+def public_download(request):
+    id = request.GET.get("id", '').strip()
+    type = request.GET.get("type", '').strip()
+    permId = request.GET.get("permId", '').strip()
+
+    if not type in ['file', 'dir']:
+        return JsonResponse({"message": "Bad inputs."}, status=400)
+
+    if type == 'dir':
+        try:
+            directory = Directory.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return JsonResponse({"message": "Not found"}, status=404)
+        try:
+            zip_file = FileSystemDAO.zip_dir(directory, request.user)
+            file_name = directory.name if directory.parent else 'ALL_MY_DATA.zip'
+            response = HttpResponse(zip_file, content_type='application/zip')
+            response['Content-Disposition'] = 'inline; filename*=UTF-8\'\'%s' % urllib.parse.quote(
+                file_name.encode('utf-8'))
+            return response
+        except Exception as e:
+            raise
+    else:
+        try:
+            file = File.objects.get(id=id)
+        except ObjectDoesNotExist:
+            return JsonResponse({"message": "Not found"}, status=404)
+        try:
+            file_data = FileSystemDAO.get_file(file.directory, file.id, key)
+            response = HttpResponse(file_data, content_type=file.type)
+            response['Content-Disposition'] = 'inline; filename*=UTF-8\'\'%s' % urllib.parse.quote(
+                file.name.encode('utf-8'))
+            return response
+        except ObjectDoesNotExist:
+            return JsonResponse({"message": "Not found"}, status=404)
