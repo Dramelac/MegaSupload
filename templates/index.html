@@ -58,6 +58,7 @@
                             <a class="dropdown-item" v-bind:href="'/api/file/download_dir?dirId=' + dir.id"><i class="fas fa-download"></i>Download all as ZIP</a>
                             <a class="dropdown-item renameBtn" href="#" v-bind:data-id="dir.id" data-type="dir"><i class="fas fa-pencil-alt"></i>Rename</a>
                             <a class="dropdown-item moveBtn" href="#" v-bind:data-id="dir.id" v-bind:data-name="dir.name" data-type="dir"><i class="fas fa-arrows-alt"></i>Move</a>
+                            <a class="dropdown-item publicShareBtn" href="#" v-bind:data-id="dir.id" data-type="dir"><i class="fas fa-share-alt"></i>Public Share</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item deleteBtn" href="#" v-bind:data-id="dir.id"
                                data-type="dir"><i class="fas fa-trash"></i>Delete</a>
@@ -76,8 +77,9 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" v-bind:href="file.link" target="_blank"><i class="fas fa-download"></i>Download</a>
                             <a class="dropdown-item renameBtn" href="#" v-bind:data-id="file.id" data-type="file"><i class="fas fa-pencil-alt"></i>Rename</a>
-                            <a class="dropdown-item" href="#" onclick="$(this).closest('.file').click();fileView.searchIsActive = true;"><i class="fas fa-share-alt"></i>Share</a>
                             <a class="dropdown-item moveBtn" href="#" v-bind:data-id="file.id" v-bind:data-name="file.name" data-type="file"><i class="fas fa-arrows-alt"></i>Move</a>
+                            <a class="dropdown-item" href="#" onclick="$(this).closest('.file').click();fileView.searchIsActive = true;"><i class="fas fa-share-alt"></i>Private Share</a>
+                            <a class="dropdown-item publicShareBtn" href="#" v-bind:data-id="file.id" data-type="file"><i class="fas fa-share-alt"></i>Public Share</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item deleteBtn" href="#" v-bind:data-id="file.id"
                                data-type="file"><i class="fas fa-trash"></i>Delete</a>
@@ -199,7 +201,7 @@
         </div>
 
         <div id="moveModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="moveModal" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Move : [[ name ]]</h5>
@@ -218,6 +220,31 @@
                 </div>
             </div>
         </div>
+
+        <div id="publicShareModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="publicShareModal" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Public share</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary copyBtn" type="button">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <script type="text/x-template" id="dirTemplate">
             <li>

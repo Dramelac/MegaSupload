@@ -114,6 +114,6 @@ def remove(dirId, user):
             FileDAO.remove(file['id'], user, True)
         dirList = Directory.objects.filter(parent=directory)
         for current_dir in dirList:
-            removeDirectory(current_dir, user)
+            remove(current_dir, user)
         directory.delete()  # Cascade delete ?
         # FK problem ? to test

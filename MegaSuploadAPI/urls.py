@@ -15,6 +15,7 @@ urlpatterns = [
     path('file/upload', file_views.upload, name="upload"),
     path('file/download', file_views.download),
     path('file/download_dir', file_views.downloadDir),
+    path('file/public_download', file_views.public_download),
     path('file/list_item', file_views.ls),
     path('file/add_dir', file_views.addDirectory),
     path('file/rename_dir', file_views.renameDirectory),
@@ -28,7 +29,6 @@ urlpatterns = [
     path('file/get_tree', file_views.get_tree),
     path('share/share', file_views.share),
     path('share/public', file_views.public_share),
-    path('share/publicDownload', file_views.public_download),
     path('share/ls', file_views.ls_shared),
     path('test', file_views.test),
 ]

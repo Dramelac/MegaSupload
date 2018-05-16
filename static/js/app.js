@@ -37,7 +37,7 @@ function getFileIcon(mimeType) {
 }
 
 async function loadDir(dirId, dirName, event) {
-    if (typeof event !== 'undefined' && (event.target.tagName === 'BUTTON' || event.target.tagName === 'A')) return;
+    if (typeof event !== 'undefined' && (event.target.tagName === 'BUTTON' || event.target.tagName === 'path' || event.target.tagName === 'A')) return;
     this.loader = true;
     this.files = [];
     this.directories = [];
@@ -226,6 +226,13 @@ $('#newDirModal').on('show.bs.modal', function (e) {
     $('#newDirName').val('');
 });
 
+$('#publicShareModal').on('hidden.bs.modal', function (e) {
+    $('#publicShareModal .copyBtn').text('Copy');
+    $('#publicShareModal .copyBtn').css('background', '');
+    $('#publicShareModal .copyBtn').css('color', '');
+
+
+});
 
 $('#dropbox').on("dragenter", function (e) {
     e.preventDefault();
@@ -429,5 +436,32 @@ $(document).on('click', '.dirItem', async function () {
         fileManager.openDir(currentDirId);
     } catch (err) {
         alert(err.responseJSON.message);
+    }
+});
+
+$(document).on('click', '.publicShareBtn', async function () {
+    var type = $(this).attr('data-type');
+    var id = $(this).attr('data-id');
+    try {
+        var data = await $.getJSON('/api/share/public?id=' + id + '&type=' + type);
+        var link = location.protocol + '//' + location.host + '/api/file/public_download?id=' + id + '&type=' + type + '&permId=' + data.permId
+        $('#publicShareModal input').val(link);
+        $('#publicShareModal').modal('show');
+    } catch (err) {
+        alert(err.responseJSON.message);
+    }
+});
+
+$(document).on('click', '.copyBtn', function () {
+    var input = $(this).parent().prevAll('input');
+    input.focus();
+    input.select();
+    try {
+        document.execCommand('copy');
+        $(this).text('Copied !');
+        $(this).css('background', 'green');
+        $(this).css('color', 'white');
+    } catch (err) {
+        alert("Not supported in your browser")
     }
 });

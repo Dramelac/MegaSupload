@@ -85,7 +85,7 @@ def downloadDir(request):
 
     try:
         zip_file = FileSystemDAO.zip_dir(directory, request.user)
-        file_name = directory.name if directory.parent else 'ALL_MY_DATA.zip'
+        file_name = directory.name + '.zip' if directory.parent else 'ALL_MY_DATA.zip'
         response = HttpResponse(zip_file, content_type='application/zip')
         response['Content-Disposition'] = 'inline; filename*=UTF-8\'\'%s' % urllib.parse.quote(
             file_name.encode('utf-8'))
@@ -366,8 +366,8 @@ def public_download(request):
         except ObjectDoesNotExist:
             return JsonResponse({"message": "Not found"}, status=404)
         try:
-            zip_file = FileSystemDAO.zip_dir(directory, request.user)
-            file_name = directory.name if directory.parent else 'ALL_MY_DATA.zip'
+            zip_file = FileSystemDAO.zip_dir(directory, perm.user)
+            file_name = directory.name + '.zip' if directory.parent else 'ALL_MY_DATA.zip'
             response = HttpResponse(zip_file, content_type='application/zip')
             response['Content-Disposition'] = 'inline; filename*=UTF-8\'\'%s' % urllib.parse.quote(
                 file_name.encode('utf-8'))
@@ -380,7 +380,7 @@ def public_download(request):
         except ObjectDoesNotExist:
             return JsonResponse({"message": "Not found"}, status=404)
         try:
-            file_data = FileSystemDAO.get_file(file.directory, file.id, key)
+            file_data = FileSystemDAO.get_file(file.directory, file.id, '')
             response = HttpResponse(file_data, content_type=file.type)
             response['Content-Disposition'] = 'inline; filename*=UTF-8\'\'%s' % urllib.parse.quote(
                 file.name.encode('utf-8'))
