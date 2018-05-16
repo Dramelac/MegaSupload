@@ -9,7 +9,7 @@ from django.forms.models import model_to_dict
 
 from MegaSuploadAPI.DAL import FileSystemDAO, DirectoryDAO, FileDAO, PermissionDAO, FileKeyDAO, UserDAO
 from MegaSuploadAPI.forms import *
-from MegaSuploadAPI.models import File, Directory
+from MegaSuploadAPI.models import File, Directory, Permission
 from MegaSuploadAPI.tools.decorators import json_parser
 from MegaSuploadAPI.tools.tools import is_uuid
 
@@ -345,7 +345,6 @@ def public_share(request):
         return JsonResponse({"message": "Not found"}, status=404)
 
 
-@login_required
 def public_download(request):
     id = request.GET.get("id", '').strip()
     type = request.GET.get("type", '').strip()
@@ -353,6 +352,13 @@ def public_download(request):
 
     if not type in ['file', 'dir']:
         return JsonResponse({"message": "Bad inputs."}, status=400)
+
+    try:
+        perm = Permission.objects.get(id=permId)
+        if not (perm.directory and str(perm.directory.id) == id) and not (perm.file and str(perm.file.id) == id):
+            return JsonResponse({"message": "Not found"}, status=404)
+    except:
+        return JsonResponse({"message": "Not found"}, status=404)
 
     if type == 'dir':
         try:
