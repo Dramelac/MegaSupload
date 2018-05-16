@@ -227,11 +227,7 @@ $('#newDirModal').on('show.bs.modal', function (e) {
 });
 
 $('#publicShareModal').on('hidden.bs.modal', function (e) {
-    $('#publicShareModal .copyBtn').text('Copy');
-    $('#publicShareModal .copyBtn').css('background', '');
-    $('#publicShareModal .copyBtn').css('color', '');
-
-
+    $('#publicShareModal .copyBtn').text('Copy').removeClass('btn-success').addClass('btn-outline-primary');
 });
 
 $('#dropbox').on("dragenter", function (e) {
@@ -458,9 +454,7 @@ $(document).on('click', '.copyBtn', function () {
     input.select();
     try {
         document.execCommand('copy');
-        $(this).text('Copied !');
-        $(this).css('background', 'green');
-        $(this).css('color', 'white');
+        $(this).text('Copied !').removeClass('btn-outline-primary').addClass('btn-success');
     } catch (err) {
         alert("Not supported in your browser")
     }
