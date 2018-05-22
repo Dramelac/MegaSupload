@@ -8,7 +8,7 @@ Vue.filter('prettyBytes', function (num) {
 
 function getFileIcon(mimeType) {
     var iconClasses = {
-        'image': 'fa-file-image',
+        'image/': 'fa-file-image',
         'audio': 'fa-file-audio',
         'video': 'fa-file-video',
         'application/pdf': 'fa-file-pdf',
@@ -90,7 +90,7 @@ function fileClicked(fileId, event) {
     })
     var el = document.createElement("i");
     el.className = "fas " + getFileIcon(file.type);
-    if (/image/.test(file.type)) {
+    if (/image\//.test(file.type)) {
         el = new Image();
         el.src = file.link
     } else if (/mp4/.test(file.type)) {
