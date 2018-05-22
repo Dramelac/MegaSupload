@@ -293,3 +293,7 @@ progress::-webkit-progress-value {
     background: #5a6268;
     cursor: pointer;
 }
+
+body.shareIsActive .notForShare {
+    display: none;
+}

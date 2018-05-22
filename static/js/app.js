@@ -325,9 +325,9 @@ $('#newDirBtn').on('click', async function () {
 $('#toggleShare').on('click', function () {
     setTimeout(function () {
         if ($('#toggleShare').attr('aria-pressed') === "true") {
-            $('.notForShare').hide()
+            $('body').addClass('shareIsActive');
         } else {
-            $('.notForShare').show()
+            $('body').removeClass('shareIsActive');
         }
         fileManager.openDir();
     });
