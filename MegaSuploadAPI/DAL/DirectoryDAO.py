@@ -106,7 +106,10 @@ def moveDirectory(directory, newParent, user):
 
 # Only for owner (for now)
 def remove(dirId, user):
-    directory = getDirectoryFromId(dirId, user)
+    __remove(getDirectoryFromId(dirId, user), user)
+
+
+def __remove(directory, user):
     perm = PermissionDAO.getPermission(directory, user)
     if perm.owner and directory.parent is not None:
         fileList = FileDAO.listFiles(directory, user)
@@ -114,6 +117,6 @@ def remove(dirId, user):
             FileDAO.remove(file['id'], user, True)
         dirList = Directory.objects.filter(parent=directory)
         for current_dir in dirList:
-            remove(current_dir, user)
+            __remove(current_dir, user)
         directory.delete()  # Cascade delete ?
         # FK problem ? to test
