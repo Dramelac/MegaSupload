@@ -117,6 +117,8 @@ def ls(request):
 
     dirList = DirectoryDAO.listDirectory(directory, request.user)
     fileList = FileDAO.listFiles(directory, request.user)
+    for i, file in enumerate(fileList):
+        fileList[i]['encryptedKey'] = FileKeyDAO.getFileKey(request.user, file['id']).key
     return JsonResponse({"directory": dirList, "file": fileList}, status=200)
 
 

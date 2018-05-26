@@ -48,9 +48,18 @@ async function loadDir(dirId, dirName, event) {
     }
 
     this.files = data.file.map(function (f) {
-        f.link = '/api/file/download?did=' + f.directory_id + '&fid=' + f.id;
+        f.key = '';
+        try {
+            var privateKey = forge.pki.privateKeyFromPem(localStorage.priv_key);
+            f.key = privateKey.decrypt(forge.util.decode64(f.encryptedKey), 'RSA-OAEP');
+        } catch (e) {
+            console.log(e)
+        }
+        f.link = '/api/file/download?did=' + f.directory_id + '&fid=' + f.id + '&k=' + f.key;
         f.menuShown = false;
         return f;
+    }).sort(function (a, b) {
+        return a - b;
     });
     this.directories = data.directory.filter(function (d) {
         return d.name !== ".";
@@ -87,9 +96,8 @@ function fileClicked(fileId, event) {
     if (typeof event !== 'undefined' && (event.target.tagName === 'BUTTON' || event.target.tagName === 'A')) return;
     var file = this.files.find(function (f) {
         return f.id == fileId;
-    })
-    var el = document.createElement("i");
-    el.className = "fas " + getFileIcon(file.type);
+    });
+    var el;
     if (/image\//.test(file.type)) {
         el = new Image();
         el.src = file.link
@@ -100,6 +108,9 @@ function fileClicked(fileId, event) {
     } else if (/pdf|text/.test(file.type)) {
         el = document.createElement("iframe");
         el.src = file.link;
+    } else {
+        el = document.createElement("i");
+        el.className = "fas " + getFileIcon(file.type);
     }
     fileView.file = file;
     $('#fileDetailsModal .modal-body #fileContent').html(el);
@@ -440,7 +451,7 @@ $(document).on('click', '.publicShareBtn', async function () {
     var id = $(this).attr('data-id');
     try {
         var data = await $.getJSON('/api/share/public?id=' + id + '&type=' + type);
-        var link = location.protocol + '//' + location.host + '/api/file/public_download?id=' + id + '&type=' + type + '&permId=' + data.permId
+        var link = location.protocol + '//' + location.host + '/api/file/public_download?id=' + id + '&type=' + type + '&permId=' + data.permId;
         $('#publicShareModal input').val(link);
         $('#publicShareModal').modal('show');
     } catch (err) {
