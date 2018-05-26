@@ -269,7 +269,7 @@ def removeDirectory(request):
 def share(request):
     elementId = request.json.get('elementId', '').strip()
     targetUserId = request.json.get('targetUserId', '').strip()
-    key = request.json.get('encryptedKey', '').strip()
+    key = request.json.get('key', '').strip()
     #    Need only for file sharing| /!\ directory sharing don't handle FileKey
     read = request.json.get('read', 0)
     write = request.json.get('write', 0)
@@ -290,7 +290,7 @@ def share(request):
         except ObjectDoesNotExist:
             return JsonResponse({"message": "Not found"}, status=404)
 
-        if type(element) is File and key == "":
+        if type(element) is File and not key:
             return JsonResponse({"message": "Bad inputs"}, status=400)
 
         # Is permission already exist?
@@ -304,7 +304,7 @@ def share(request):
             except ObjectDoesNotExist:
                     PermissionDAO.share(user, targetUser, element, read, write, share)
             if type(element) is File:
-                FileKeyDAO.insertFileKey(targetUser, element, key)
+                FileKeyDAO.newFileKey(targetUser, element, key.encode('utf8'))
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=400)
         return JsonResponse({"message": "Success"}, status=200)
@@ -318,6 +318,8 @@ def ls_shared(request):
     user = request.user
     dir_list = PermissionDAO.getSharedDirectory(user)
     file_list = PermissionDAO.getSharedFile(user)
+    for i, file in enumerate(file_list):
+        file_list[i]['encryptedKey'] = FileKeyDAO.getFileKey(request.user, file['id']).key
     return JsonResponse({"directory": dir_list, "file": file_list}, status=200)
 
 

@@ -36,6 +36,18 @@ function getFileIcon(mimeType) {
     return 'fa-file';
 }
 
+function compareName(a, b) {
+    var nameA = a.name.toUpperCase(); // ignore upper and lowercase
+    var nameB = b.name.toUpperCase(); // ignore upper and lowercase
+    if (nameA < nameB) {
+        return -1;
+    }
+    if (nameA > nameB) {
+        return 1;
+    }
+    return 0;
+}
+
 async function loadDir(dirId, dirName, event) {
     if (typeof event !== 'undefined' && (event.target.tagName === 'BUTTON' || event.target.tagName === 'path' || event.target.tagName === 'A')) return;
     this.loader = true;
@@ -58,17 +70,13 @@ async function loadDir(dirId, dirName, event) {
         f.link = '/api/file/download?did=' + f.directory_id + '&fid=' + f.id + '&k=' + f.key;
         f.menuShown = false;
         return f;
-    }).sort(function (a, b) {
-        return a - b;
-    });
+    }).sort(compareName);
     this.directories = data.directory.filter(function (d) {
         return d.name !== ".";
     }).map(function (d) {
         d.menuShown = false;
         return d;
-    }).sort(function (a, b) {
-        return a - b;
-    });
+    }).sort(compareName);
     this.loader = false;
     if ($('#toggleShare').attr('aria-pressed') === "true") {
         currentDirId = null;
@@ -396,10 +404,16 @@ $(document).on('click', '.searchUserDiv', function () {
 });
 $(document).on('click', '#submitShareBtn', async function () {
     try {
+        var reqFileKey = await $.post('/api/file/get_key', JSON.stringify({
+            'fileId': fileView.file.id
+        }));
+        var privateKey = forge.pki.privateKeyFromPem(localStorage.priv_key);
+        var fileKeyDecrypted = privateKey.decrypt(forge.util.decode64(reqFileKey.key), 'RSA-OAEP');
+
         var res = await $.post('/api/share/share', JSON.stringify({
             'elementId': fileView.file.id,
             'targetUserId': fileView.userSelected.id,
-            'encryptedKey': 'TODO',
+            'key': fileKeyDecrypted,
             'read': 1,
             'write': $('#writePerm').is(":checked"),
             'share': $('#sharePerm').is(":checked")
@@ -407,7 +421,7 @@ $(document).on('click', '#submitShareBtn', async function () {
         fileView.resetSearch();
         alert(res.message)
     } catch (e) {
-        alert(e.responseJSON.message)
+        alert(e.responseJSON.message || e)
     }
 });
 
