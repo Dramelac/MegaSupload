@@ -9,8 +9,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from MegaSuploadAPI.models import FileKey
 
 
-def newFileKey(owner, file, uncrypted_key=binascii.hexlify(os.urandom(20))):
-    # genereration password (20)=> chiffrement rsa de celui si avec user pub_key
+def newFileKey(owner, file, uncrypted_key=binascii.hexlify(os.urandom(16))):
+    # genereration password (16)=> chiffrement rsa de celui si avec user pub_key
     # Will raise NotImplementedError if random is not available on the system
 
     pub_key = RSA.import_key(owner.pub_key.encode('utf8'))
