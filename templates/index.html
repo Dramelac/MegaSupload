@@ -3,7 +3,25 @@
 
 {% block body %}
     {% if not user.is_authenticated %}
-        <h2>Welcome ! Please log-in to discover our great features !</h2>
+        <h2>Welcome on MegaSupload ! </h2>
+        <div class="row">
+            <div class="col-5">
+                <img style="max-height: 50vh;" src="{% static "img/logo_megasupload.png" %}" class="img-fluid">
+            </div>
+            <div class="col-7" style="margin-top: 80px;line-height: 35px;font-size: 18px;">
+                MegaSupload is a free storage service.<br>
+                Store up to 30 GB of data.<br>
+                Preview your pictures, movies, PDF and text files.<br>
+                Share what you want with who you want, privately or publicly.<br>
+            </div>
+        </div>
+        <div class="row" style="margin-bottom: 100px;">
+            <div style="text-align: center;font-size: 23px; margin-bottom:20px;" class="col-12">Try it now :</div>
+            <div style="text-align: center" class="col-12">
+                <a href="{% url "login" %}"><button type="button" style="width: 150px;" class="btn btn-outline-primary btn-lg">Login</button></a>
+                <a href="{% url "register" %}"><button type="button" style="width: 150px;" class="btn btn-outline-secondary btn-lg">Register</button></a>
+            </div>
+        </div>
     {% endif %}
 
     {% if user.is_authenticated %}
